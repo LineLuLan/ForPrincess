@@ -3,16 +3,13 @@ import { AddWishConnected } from "@/components/AddWishConnected";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
-import { PRIORITY_RANK, type WishItem } from "@/types/wish";
+import { type WishItem } from "@/types/wish";
 
 type PrincessHomeProps = {
   items: WishItem[];
 };
 
 export function PrincessHome({ items }: PrincessHomeProps) {
-  const sortFn = (a: WishItem, b: WishItem) =>
-    PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-10">
@@ -52,7 +49,7 @@ export function PrincessHome({ items }: PrincessHomeProps) {
             icon={<Heart className="h-6 w-6 fill-accent stroke-accent" />}
           />
         ) : (
-          <WishGrid viewerRole="PRINCESS" density="airy" sort={sortFn} />
+          <WishGrid viewerRole="PRINCESS" density="airy" />
         )}
       </div>
     </WishListProvider>

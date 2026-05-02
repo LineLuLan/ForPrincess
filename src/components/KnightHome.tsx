@@ -3,21 +3,13 @@ import { AddWishConnected } from "@/components/AddWishConnected";
 import { EmptyState } from "@/components/EmptyState";
 import { KpiBar } from "@/components/KpiBar";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
-import { PRIORITY_RANK, type WishItem } from "@/types/wish";
+import { type WishItem } from "@/types/wish";
 
 type KnightHomeProps = {
   items: WishItem[];
 };
 
 export function KnightHome({ items }: KnightHomeProps) {
-  const sortFn = (a: WishItem, b: WishItem) => {
-    if (a.is_gifted !== b.is_gifted) return a.is_gifted ? 1 : -1;
-    if (a.is_secretly_buying !== b.is_secretly_buying) {
-      return a.is_secretly_buying ? -1 : 1;
-    }
-    return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-  };
-
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-6">
@@ -51,7 +43,7 @@ export function KnightHome({ items }: KnightHomeProps) {
             icon={<Shield className="h-6 w-6" />}
           />
         ) : (
-          <WishGrid viewerRole="KNIGHT" density="dense" sort={sortFn} />
+          <WishGrid viewerRole="KNIGHT" density="dense" />
         )}
       </div>
     </WishListProvider>

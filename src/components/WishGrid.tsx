@@ -10,7 +10,21 @@ import {
 import { motion } from "framer-motion";
 import { KnightActions } from "@/components/KnightActions";
 import { WishCard } from "@/components/WishCard";
-import type { UserRole, WishItem } from "@/types/wish";
+import { PRIORITY_RANK, type UserRole, type WishItem } from "@/types/wish";
+
+// Sort functions live in the client island so they don't have to cross
+// the server→client boundary as props (functions aren't serializable).
+function princessSort(a: WishItem, b: WishItem): number {
+  return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
+}
+
+function knightSort(a: WishItem, b: WishItem): number {
+  if (a.is_gifted !== b.is_gifted) return a.is_gifted ? 1 : -1;
+  if (a.is_secretly_buying !== b.is_secretly_buying) {
+    return a.is_secretly_buying ? -1 : 1;
+  }
+  return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
+}
 
 // ---------- mutation reducer ----------
 
@@ -80,10 +94,9 @@ export function WishListProvider({
 type WishGridProps = {
   viewerRole: UserRole;
   density?: "airy" | "dense";
-  sort?: (a: WishItem, b: WishItem) => number;
 };
 
-export function WishGrid({ viewerRole, density = "airy", sort }: WishGridProps) {
+export function WishGrid({ viewerRole, density = "airy" }: WishGridProps) {
   const { items } = useWishGrid();
   const isKnight = viewerRole === "KNIGHT";
   const gridClass =
@@ -91,7 +104,7 @@ export function WishGrid({ viewerRole, density = "airy", sort }: WishGridProps) 
       ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       : "grid gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
-  const sorted = sort ? [...items].sort(sort) : items;
+  const sorted = [...items].sort(isKnight ? knightSort : princessSort);
 
   return (
     <motion.section

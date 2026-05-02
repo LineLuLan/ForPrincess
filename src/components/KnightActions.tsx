@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Gift, Loader2, Lock, Undo2 } from "lucide-react";
 import { markGifted, setSecretBuying, unmarkGifted } from "@/app/actions/wish";
 import { celebrate } from "@/lib/confetti";
+import { useWishGrid } from "@/components/WishGrid";
 import type { WishItem } from "@/types/wish";
 
 type KnightActionsProps = {
@@ -15,10 +16,15 @@ export function KnightActions({ item }: KnightActionsProps) {
   const [error, setError] = useState<string | null>(null);
   const [showGiftBox, setShowGiftBox] = useState(false);
   const [giftMessage, setGiftMessage] = useState("");
+  const grid = useWishGrid();
 
-  const run = (fn: () => Promise<{ ok: boolean; message?: string }>) =>
+  const run = (
+    optimistic: () => void,
+    fn: () => Promise<{ ok: boolean; message?: string }>,
+  ) =>
     startTransition(async () => {
       setError(null);
+      optimistic();
       const r = await fn();
       if (!r.ok) setError(r.message ?? "Có lỗi xảy ra.");
     });
@@ -29,7 +35,17 @@ export function KnightActions({ item }: KnightActionsProps) {
         <button
           type="button"
           disabled={pending}
-          onClick={() => run(() => unmarkGifted(item.id))}
+          onClick={() =>
+            run(
+              () =>
+                grid.optimisticUpdate(item.id, {
+                  is_gifted: false,
+                  gifted_at: null,
+                  gift_message: null,
+                }),
+              () => unmarkGifted(item.id),
+            )
+          }
           className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-accent hover:text-accent disabled:opacity-60"
         >
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Undo2 className="h-3.5 w-3.5" />}
@@ -55,11 +71,18 @@ export function KnightActions({ item }: KnightActionsProps) {
             type="button"
             disabled={pending}
             onClick={() =>
-              run(async () => {
-                const r = await markGifted(item.id, giftMessage);
-                if (r.ok) celebrate();
-                return r;
-              })
+              run(
+                () => {
+                  grid.optimisticUpdate(item.id, {
+                    is_gifted: true,
+                    is_secretly_buying: false,
+                    gifted_at: new Date().toISOString(),
+                    gift_message: giftMessage.trim() || null,
+                  });
+                  celebrate();
+                },
+                () => markGifted(item.id, giftMessage),
+              )
             }
             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gold px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-gold/90 disabled:opacity-60"
           >
@@ -88,14 +111,22 @@ export function KnightActions({ item }: KnightActionsProps) {
         <button
           type="button"
           disabled={pending}
-          onClick={() => run(() => setSecretBuying(item.id, !item.is_secretly_buying))}
+          onClick={() =>
+            run(
+              () =>
+                grid.optimisticUpdate(item.id, {
+                  is_secretly_buying: !item.is_secretly_buying,
+                }),
+              () => setSecretBuying(item.id, !item.is_secretly_buying),
+            )
+          }
           className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
             item.is_secretly_buying
               ? "bg-foreground/90 text-white hover:bg-foreground"
               : "border border-border bg-surface text-muted hover:border-accent hover:text-accent"
           }`}
         >
-          {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lock className="h-3.5 w-3.5" />}
+          <Lock className="h-3.5 w-3.5" />
           {item.is_secretly_buying ? "Đang chuẩn bị" : "Chốt đơn bí mật"}
         </button>
         <button

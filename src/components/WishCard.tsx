@@ -37,8 +37,6 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
     <motion.article
       layout
       layoutId={`wish-${item.id}`}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -3, rotate: -0.6, scale: 1.015 }}
       transition={{ type: "spring", stiffness: 320, damping: 28 }}
       className="group relative flex flex-col overflow-hidden rounded-[var(--radius-soft)] border border-border bg-surface shadow-sm hover:shadow-md"

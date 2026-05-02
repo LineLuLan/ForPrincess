@@ -6,10 +6,14 @@ const PUBLIC_PATHS = ["/login", "/api/heartbeat"];
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Expose pathname to Server Components via request header so layout can
+  // theme per route (e.g. force login-pink palette on /login).
+  request.headers.set("x-pathname", pathname);
+
   // If env isn't configured yet, let everything through so dev still works.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return NextResponse.next();
+  if (!url || !key) return NextResponse.next({ request });
 
   let response = NextResponse.next({ request });
 

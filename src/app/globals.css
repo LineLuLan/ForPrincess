@@ -26,6 +26,29 @@
 }
 
 /* ============================================
+   LOGIN-PINK — pastel pink takeover for /login
+   regardless of viewer role. Warm, romantic, the
+   first impression of the app.
+   ============================================ */
+[data-role="login-pink"] {
+  --background: #fff1f5;
+  --foreground: #4a2c33;
+  --surface: #ffffff;
+  --surface-soft: #ffe4ec;
+  --accent: #ec4899;          /* pink 500 */
+  --accent-soft: #fbcfe8;     /* pink 200 */
+  --mint: #f9a8d4;            /* pink 300 — keep theme uniform, no green here */
+  --mint-soft: #fce7f3;       /* pink 100 */
+  --gold: #f59e0b;
+  --muted: #9d6273;
+  --border: #fce7f3;          /* pink 100 */
+  --ring: #f472b6;            /* pink 400 */
+
+  --bg-blob-1: rgba(244, 114, 182, 0.22);  /* pink */
+  --bg-blob-2: rgba(251, 207, 232, 0.40);  /* soft pink */
+}
+
+/* ============================================
    KNIGHT theme — Data-Dense Dashboard, navy +
    amber. Dark mode, modern, command-center.
    ============================================ */

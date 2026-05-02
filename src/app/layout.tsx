@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Caveat, JetBrains_Mono, Quicksand } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { NavbarUser } from "@/components/NavbarUser";
@@ -33,8 +34,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const viewer = await getViewer();
-  const role = (viewer?.role ?? "PRINCESS").toLowerCase();
+  const [viewer, h] = await Promise.all([getViewer(), headers()]);
+  const pathname = h.get("x-pathname") ?? "";
+  const isLogin = pathname === "/login" || pathname.startsWith("/login/");
+
+  const role = isLogin
+    ? "login-pink"
+    : (viewer?.role ?? "PRINCESS").toLowerCase();
 
   return (
     <html

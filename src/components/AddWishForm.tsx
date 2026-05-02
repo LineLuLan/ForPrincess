@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Heart, ImagePlus, Loader2, Plus } from "lucide-react";
@@ -20,6 +20,7 @@ export function AddWishForm({ onSubmit }: AddWishFormProps) {
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const {
     register,
@@ -40,6 +41,30 @@ export function AddWishForm({ onSubmit }: AddWishFormProps) {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(file ? URL.createObjectURL(file) : null);
   };
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onPaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.kind === "file" && item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) {
+            handleImage(file);
+            e.preventDefault();
+            return;
+          }
+        }
+      }
+    };
+
+    const root = formRef.current;
+    root?.addEventListener("paste", onPaste);
+    return () => root?.removeEventListener("paste", onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const submit = handleSubmit(async (values) => {
     if (onSubmit) {
@@ -66,6 +91,7 @@ export function AddWishForm({ onSubmit }: AddWishFormProps) {
 
   return (
     <form
+      ref={formRef}
       onSubmit={submit}
       className="rounded-[var(--radius-soft)] border border-border bg-surface p-5 shadow-sm sm:p-6"
     >

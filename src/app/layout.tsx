@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Quicksand } from "next/font/google";
+import { Caveat, JetBrains_Mono, Quicksand } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { NavbarUser } from "@/components/NavbarUser";
+import { getViewer } from "@/lib/auth";
 import "./globals.css";
 
 const quicksand = Quicksand({
@@ -10,18 +11,37 @@ const quicksand = Quicksand({
   weight: ["400", "500", "600", "700"],
 });
 
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = {
   title: "ForPrincess 💝",
   description: "Hộp ước mơ chung của hai người.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const viewer = await getViewer();
+  const role = (viewer?.role ?? "PRINCESS").toLowerCase();
+
   return (
-    <html lang="vi" className={`${quicksand.variable} h-full antialiased`}>
+    <html
+      lang="vi"
+      data-role={role}
+      className={`${quicksand.variable} ${caveat.variable} ${jetbrains.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
         <Navbar roleSlot={<NavbarUser />} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">

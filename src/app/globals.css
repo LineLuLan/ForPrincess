@@ -1,16 +1,50 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fff8f3;
-  --foreground: #4a2c33;
+/* ============================================
+   PRINCESS theme — Soft UI Evolution, sky + mint
+   pastel, airy, dreamy. Default for logged-out and
+   for anyone with role=PRINCESS.
+   ============================================ */
+:root,
+[data-role="princess"] {
+  --background: #f0f9ff;
+  --foreground: #0f172a;
   --surface: #ffffff;
-  --surface-soft: #fff1ea;
-  --accent: #ec7c8b;
-  --accent-soft: #fbd0d9;
-  --gold: #f3c969;
-  --muted: #a78a92;
-  --border: #f3d9d6;
-  --ring: #f4a3b0;
+  --surface-soft: #ecfeff;
+  --accent: #0ea5e9;        /* sky 500 */
+  --accent-soft: #bae6fd;    /* sky 200 */
+  --mint: #5eead4;           /* teal 300 */
+  --mint-soft: #ccfbf1;      /* teal 100 */
+  --gold: #f59e0b;           /* amber 500 */
+  --muted: #64748b;
+  --border: #e0f2fe;         /* sky 100 */
+  --ring: #38bdf8;           /* sky 400 */
+
+  /* Body atmosphere */
+  --bg-blob-1: rgba(94, 234, 212, 0.18);   /* mint */
+  --bg-blob-2: rgba(186, 230, 253, 0.30);  /* sky */
+}
+
+/* ============================================
+   KNIGHT theme — Data-Dense Dashboard, navy +
+   amber. Dark mode, modern, command-center.
+   ============================================ */
+[data-role="knight"] {
+  --background: #0b1220;     /* near-black slate */
+  --foreground: #e2e8f0;     /* slate 200 */
+  --surface: #111c33;         /* slate 900-ish */
+  --surface-soft: #1e293b;   /* slate 800 */
+  --accent: #3b82f6;          /* blue 500 */
+  --accent-soft: #1e3a8a;     /* blue 900 */
+  --mint: #06b6d4;            /* cyan 500 */
+  --mint-soft: #164e63;       /* cyan 900 */
+  --gold: #f59e0b;            /* amber 500 — kept for ribbon legibility */
+  --muted: #94a3b8;           /* slate 400 */
+  --border: #334155;          /* slate 700 */
+  --ring: #60a5fa;            /* blue 400 */
+
+  --bg-blob-1: rgba(59, 130, 246, 0.20);
+  --bg-blob-2: rgba(6, 182, 212, 0.10);
 }
 
 @theme inline {
@@ -20,19 +54,22 @@
   --color-surface-soft: var(--surface-soft);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
   --color-gold: var(--gold);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-ring: var(--ring);
   --font-sans: var(--font-quicksand);
-  --font-mono: var(--font-geist-mono);
+  --font-script: var(--font-caveat);
+  --font-mono: var(--font-jetbrains);
   --radius-soft: 1.25rem;
 }
 
 body {
   background:
-    radial-gradient(60rem 60rem at 110% -10%, rgba(243, 201, 105, 0.15), transparent 60%),
-    radial-gradient(50rem 50rem at -10% 110%, rgba(236, 124, 139, 0.18), transparent 55%),
+    radial-gradient(60rem 60rem at 110% -10%, var(--bg-blob-1), transparent 60%),
+    radial-gradient(50rem 50rem at -10% 110%, var(--bg-blob-2), transparent 55%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -40,7 +77,28 @@ body {
   letter-spacing: 0.01em;
 }
 
+/* Knight gets denser typography rhythm */
+[data-role="knight"] body {
+  letter-spacing: 0;
+}
+
 ::selection {
   background: var(--accent-soft);
   color: var(--foreground);
+}
+
+/* Tabular numerals for KPIs and prices in Knight view */
+.font-mono,
+.tabular-nums,
+[data-role="knight"] .price {
+  font-feature-settings: "tnum", "ss01";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

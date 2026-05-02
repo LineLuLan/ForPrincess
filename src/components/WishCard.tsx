@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ExternalLink, Gift, HeartHandshake, Lock, Sparkles } from "lucide-react";
+import { EditWishDialog } from "@/components/EditWishDialog";
 import {
   PRIORITY_LABEL,
   type UserRole,
@@ -28,6 +29,9 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
   const price = formatPrice(item.price, item.currency);
   const giftedOn = formatGiftedDate(item.gifted_at);
   const isKnight = viewerRole === "KNIGHT";
+  // Knight can always edit. Princess can only edit non-gifted wishes
+  // (her RLS policy forbids touching is_gifted=true rows).
+  const canEdit = isKnight || !item.is_gifted;
 
   return (
     <motion.article
@@ -41,6 +45,7 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
     >
       {item.is_gifted && <GiftedRibbon />}
       {isKnight && item.is_secretly_buying && !item.is_gifted && <SecretRibbon />}
+      {canEdit && <EditWishDialog item={item} viewerRole={viewerRole} />}
 
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-soft">
         {item.image_url ? (

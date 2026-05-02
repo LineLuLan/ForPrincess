@@ -5,6 +5,7 @@ import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
 import { wishPriorityValues } from "@/lib/wish-schema";
+import type { WishUpdate } from "@/types/db";
 
 const addWishInput = z.object({
   title: z.string().trim().min(1).max(120),
@@ -119,6 +120,63 @@ export async function unmarkGifted(wishId: string): Promise<ActionResult> {
     .from("wish_items")
     .update({ is_gifted: false, gifted_at: null, gift_message: null })
     .eq("id", wishId);
+
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/memories");
+  return { ok: true };
+}
+
+const updateWishInput = z.object({
+  wishId: z.string().uuid(),
+  title: z.string().trim().min(1).max(120).optional(),
+  url: z.string().trim().url().or(z.literal("")).nullable().optional(),
+  price: z.number().nonnegative().nullable().optional(),
+  priority: z.enum(wishPriorityValues).optional(),
+  note: z.string().trim().max(500).nullable().optional(),
+  giftMessage: z.string().trim().max(500).nullable().optional(),
+});
+
+export type UpdateWishInput = z.infer<typeof updateWishInput>;
+
+export async function updateWish(input: UpdateWishInput): Promise<ActionResult> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
+
+  const parsed = updateWishInput.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? "Dữ liệu chưa hợp lệ." };
+  }
+
+  // Whitelist fields per role. Princess never gets to touch gift_message —
+  // RLS would block it on her safe-fields policy too, but failing here
+  // gives a friendly Vietnamese error instead of a Postgres permission denied.
+  const update: WishUpdate = {};
+  if (parsed.data.title !== undefined) update.title = parsed.data.title;
+  if (parsed.data.url !== undefined) update.url = parsed.data.url || null;
+  if (parsed.data.price !== undefined) update.price = parsed.data.price;
+  if (parsed.data.priority !== undefined) update.priority = parsed.data.priority;
+  if (parsed.data.note !== undefined) update.note = parsed.data.note || null;
+  if (parsed.data.giftMessage !== undefined) {
+    if (viewer.role !== "KNIGHT") {
+      return {
+        ok: false,
+        message: "Chỉ Knight mới sửa được lời nhắn của quà 🛡️",
+      };
+    }
+    update.gift_message = parsed.data.giftMessage || null;
+  }
+
+  if (Object.keys(update).length === 0) {
+    return { ok: false, message: "Không có gì để cập nhật." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("wish_items")
+    .update(update)
+    .eq("id", parsed.data.wishId);
 
   if (error) return { ok: false, message: error.message };
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
+import { NavbarUser } from "@/components/NavbarUser";
 import "./globals.css";
 
 const quicksand = Quicksand({
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${quicksand.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Navbar />
+        <Navbar roleSlot={<NavbarUser />} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
           {children}
         </main>

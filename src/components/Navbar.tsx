@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Heart, Sparkles } from "lucide-react";
+import { NavLink } from "@/components/NavLink";
 
 type NavbarProps = {
   roleSlot?: React.ReactNode;
@@ -12,6 +13,7 @@ export function Navbar({ roleSlot, signOutSlot }: NavbarProps) {
       <div className="mx-auto flex h-16 max-w-5xl items-center gap-3 px-4 sm:px-6">
         <Link
           href="/"
+          prefetch
           className="group flex items-center gap-2 font-bold text-foreground"
         >
           <span className="relative grid h-9 w-9 place-items-center rounded-full bg-accent-soft text-accent shadow-sm">
@@ -35,16 +37,5 @@ export function Navbar({ roleSlot, signOutSlot }: NavbarProps) {
         </div>
       </div>
     </header>
-  );
-}
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="rounded-full px-3 py-1.5 text-muted transition hover:bg-accent-soft hover:text-foreground"
-    >
-      {children}
-    </Link>
   );
 }

@@ -84,7 +84,7 @@ export function KnightActions({ item }: KnightActionsProps) {
                 () => markGifted(item.id, giftMessage),
               )
             }
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gold px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-gold/90 disabled:opacity-60"
+            className="btn-ripple inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gold px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-gold/90 disabled:opacity-60"
           >
             {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Gift className="h-3.5 w-3.5" />}
             Đã tặng 🎁
@@ -133,7 +133,7 @@ export function KnightActions({ item }: KnightActionsProps) {
           type="button"
           disabled={pending}
           onClick={() => setShowGiftBox(true)}
-          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-accent/90 disabled:opacity-60"
+          className="btn-ripple inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-accent/90 disabled:opacity-60"
         >
           <Gift className="h-3.5 w-3.5" /> Đã tặng
         </button>

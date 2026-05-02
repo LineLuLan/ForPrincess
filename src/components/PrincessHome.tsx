@@ -1,6 +1,7 @@
 import { Heart, Sparkles } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
 import { EmptyState } from "@/components/EmptyState";
+import { FloatingHearts } from "@/components/FloatingHearts";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
 import { PRIORITY_RANK, type WishItem } from "@/types/wish";
 
@@ -17,6 +18,7 @@ export function PrincessHome({ items }: PrincessHomeProps) {
       <div className="flex flex-col gap-10">
         {/* Hero — airy, dreamy, script accent */}
         <header className="relative overflow-hidden rounded-[2rem] border border-border bg-surface/60 px-6 py-10 sm:px-10 sm:py-12">
+          <FloatingHearts />
           <div className="pointer-events-none absolute -right-12 -top-10 h-44 w-44 rounded-full bg-mint/30 blur-3xl" />
           <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-accent-soft/60 blur-3xl" />
 

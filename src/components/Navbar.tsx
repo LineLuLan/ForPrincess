@@ -16,7 +16,7 @@ export function Navbar({ roleSlot, signOutSlot }: NavbarProps) {
           prefetch
           className="group flex items-center gap-2 font-bold text-foreground"
         >
-          <span className="relative grid h-9 w-9 place-items-center rounded-full bg-accent-soft text-accent shadow-sm">
+          <span className="heart-pulse relative grid h-9 w-9 place-items-center rounded-full bg-accent-soft text-accent shadow-sm">
             <Heart className="h-4.5 w-4.5 fill-accent stroke-accent" strokeWidth={2.2} />
             <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-gold" />
           </span>

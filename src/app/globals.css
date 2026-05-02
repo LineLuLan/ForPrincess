@@ -117,11 +117,77 @@ body {
   font-feature-settings: "tnum", "ss01";
 }
 
+/* ============================================
+   Cute animations (Princess-only, gated by
+   prefers-reduced-motion at the bottom).
+   ============================================ */
+
+/* Floating heart that rises from the bottom of its parent
+   to the top, gently drifting left/right, fading out. */
+@keyframes float-heart {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--peak-opacity, 1);
+  }
+  100% {
+    transform: translateY(-110%) translateX(var(--drift, 0px));
+    opacity: 0;
+  }
+}
+
+.float-heart {
+  animation: float-heart linear infinite;
+  will-change: transform, opacity;
+  text-shadow: 0 1px 3px rgba(236, 72, 153, 0.18);
+}
+
+/* Hover ripple on primary CTAs — pseudo expanding ring. */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-ripple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45), transparent 60%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 220ms ease, transform 320ms ease;
+  pointer-events: none;
+}
+.btn-ripple:hover::before {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Logo heart pulse — gentle scale loop, Princess only. */
+@keyframes heart-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+[data-role="princess"] .heart-pulse,
+[data-role="login-pink"] .heart-pulse {
+  animation: heart-pulse 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+  .float-heart,
+  .heart-pulse {
+    display: none;
   }
 }

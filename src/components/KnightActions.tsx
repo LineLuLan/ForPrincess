@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Gift, Loader2, Lock, Undo2 } from "lucide-react";
 import { markGifted, setSecretBuying, unmarkGifted } from "@/app/actions/wish";
+import { celebrate } from "@/lib/confetti";
 import type { WishItem } from "@/types/wish";
 
 type KnightActionsProps = {
@@ -53,7 +54,13 @@ export function KnightActions({ item }: KnightActionsProps) {
           <button
             type="button"
             disabled={pending}
-            onClick={() => run(() => markGifted(item.id, giftMessage))}
+            onClick={() =>
+              run(async () => {
+                const r = await markGifted(item.id, giftMessage);
+                if (r.ok) celebrate();
+                return r;
+              })
+            }
             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gold px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-gold/90 disabled:opacity-60"
           >
             {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Gift className="h-3.5 w-3.5" />}

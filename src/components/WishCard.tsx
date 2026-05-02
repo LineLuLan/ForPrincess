@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ExternalLink, Gift, HeartHandshake, Lock, Sparkles } from "lucide-react";
 import {
   PRIORITY_LABEL,
@@ -27,7 +30,15 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
   const isKnight = viewerRole === "KNIGHT";
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-soft)] border border-border bg-surface shadow-sm transition hover:shadow-md">
+    <motion.article
+      layout
+      layoutId={`wish-${item.id}`}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -3, rotate: -0.6, scale: 1.015 }}
+      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+      className="group relative flex flex-col overflow-hidden rounded-[var(--radius-soft)] border border-border bg-surface shadow-sm hover:shadow-md"
+    >
       {item.is_gifted && <GiftedRibbon />}
       {isKnight && item.is_secretly_buying && !item.is_gifted && <SecretRibbon />}
 
@@ -99,7 +110,7 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
 
         {actionsSlot && <div className="border-t border-border/70 pt-3">{actionsSlot}</div>}
       </div>
-    </article>
+    </motion.article>
   );
 }
 

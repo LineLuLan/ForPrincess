@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 /* ============================================
-   PRINCESS theme — Soft UI Evolution, sky + mint
-   pastel, airy, dreamy. Default for logged-out and
-   for anyone with role=PRINCESS.
+   PRINCESS theme — Soft UI Evolution, pink + mint
+   pastel, airy, dreamy, "bé ưng" vibe. Default for
+   logged-out and for anyone with role=PRINCESS.
    ============================================ */
 :root,
 [data-role="princess"] {
-  --background: #f0f9ff;
-  --foreground: #0f172a;
+  --background: #fff1f5;
+  --foreground: #4a2032;
   --surface: #ffffff;
-  --surface-soft: #ecfeff;
-  --accent: #0ea5e9;        /* sky 500 */
-  --accent-soft: #bae6fd;    /* sky 200 */
-  --mint: #5eead4;           /* teal 300 */
-  --mint-soft: #ccfbf1;      /* teal 100 */
-  --gold: #f59e0b;           /* amber 500 */
-  --muted: #64748b;
-  --border: #e0f2fe;         /* sky 100 */
-  --ring: #38bdf8;           /* sky 400 */
+  --surface-soft: #fef1f8;
+  --accent: #ec4899;          /* pink 500 */
+  --accent-soft: #fbcfe8;     /* pink 200 */
+  --mint: #86efac;            /* green 300 — true pastel green */
+  --mint-soft: #dcfce7;       /* green 100 */
+  --gold: #f59e0b;            /* amber 500, kept for ribbons */
+  --muted: #9d6273;
+  --border: #fce7f3;          /* pink 100 */
+  --ring: #f472b6;            /* pink 400 */
 
-  /* Body atmosphere */
-  --bg-blob-1: rgba(94, 234, 212, 0.18);   /* mint */
-  --bg-blob-2: rgba(186, 230, 253, 0.30);  /* sky */
+  /* Body atmosphere — green + pink pastel wash */
+  --bg-blob-1: rgba(134, 239, 172, 0.20);  /* green */
+  --bg-blob-2: rgba(251, 207, 232, 0.32);  /* pink */
 }
 
 /* ============================================

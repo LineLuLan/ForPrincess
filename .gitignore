@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude memory — contains personal info (emails, UUIDs); add -f to commit if desired.
+.claude-memory/

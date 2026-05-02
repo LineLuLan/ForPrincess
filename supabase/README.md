@@ -43,8 +43,8 @@ one for Knight). Then back in the **SQL Editor**:
 
 ```sql
 insert into profiles (id, display_name, role) values
-  ('<princess-user-uuid>', 'Princess', 'PRINCESS'),
-  ('<knight-user-uuid>',   'Knight',   'KNIGHT');
+  ('e2d149a6-94ba-4e0c-98ca-263cef4dc47c', 'Princess', 'PRINCESS'),
+  ('f7cb7d69-458f-420f-bbed-b1d96e19b496',   'Knight',   'KNIGHT');
 ```
 
 ## 6. Wire env vars

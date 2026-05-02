@@ -71,7 +71,13 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
         </div>
 
         {price && (
-          <div className="text-sm font-semibold text-accent">{price}</div>
+          <div
+            className={`price text-sm font-semibold text-accent ${
+              isKnight ? "font-mono tabular-nums tracking-tight" : ""
+            }`}
+          >
+            {price}
+          </div>
         )}
 
         {item.note && (
@@ -116,7 +122,7 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
 
 function GiftedRibbon() {
   return (
-    <div className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-gold/95 px-2.5 py-1 text-[11px] font-semibold text-foreground shadow">
+    <div className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-gold/95 px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow">
       <Gift className="h-3.5 w-3.5" /> Đã tặng
     </div>
   );
@@ -124,7 +130,7 @@ function GiftedRibbon() {
 
 function SecretRibbon() {
   return (
-    <div className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-foreground/85 px-2.5 py-1 text-[11px] font-semibold text-white shadow">
+    <div className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-mint px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow">
       <Lock className="h-3.5 w-3.5" /> Đang chuẩn bị
     </div>
   );

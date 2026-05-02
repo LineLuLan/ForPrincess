@@ -1,14 +1,17 @@
 import { AddWishForm } from "@/components/AddWishForm";
 import { EmptyState } from "@/components/EmptyState";
 import { WishCard } from "@/components/WishCard";
-import { MOCK_WISHES } from "@/lib/mock-data";
+import { fetchVisibleWishes } from "@/lib/wish-queries";
 import { PRIORITY_RANK } from "@/types/wish";
 
-export default function HomePage() {
-  const items = [...MOCK_WISHES].sort((a, b) => {
-    if (a.is_gifted !== b.is_gifted) return a.is_gifted ? 1 : -1;
-    return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
-  });
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { items, source, warning } = await fetchVisibleWishes();
+
+  const sorted = [...items].sort(
+    (a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority],
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -24,13 +27,19 @@ export default function HomePage() {
         </p>
       </header>
 
+      {source === "mock" && warning && (
+        <div className="rounded-2xl border border-dashed border-accent-soft bg-accent-soft/40 px-4 py-3 text-xs text-accent">
+          ⚠️ {warning}
+        </div>
+      )}
+
       <AddWishForm />
 
-      {items.length === 0 ? (
+      {sorted.length === 0 ? (
         <EmptyState />
       ) : (
         <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+          {sorted.map((item) => (
             <WishCard key={item.id} item={item} />
           ))}
         </section>

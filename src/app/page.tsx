@@ -1,4 +1,4 @@
-import { AddWishForm } from "@/components/AddWishForm";
+import { AddWishConnected } from "@/components/AddWishConnected";
 import { EmptyState } from "@/components/EmptyState";
 import { WishCard } from "@/components/WishCard";
 import { fetchVisibleWishes } from "@/lib/wish-queries";
@@ -33,7 +33,7 @@ export default async function HomePage() {
         </div>
       )}
 
-      <AddWishForm />
+      <AddWishConnected />
 
       {sorted.length === 0 ? (
         <EmptyState />

@@ -10,10 +10,8 @@ export async function DailyLoveNote({ customNotes = [] }: DailyLoveNoteProps) {
   if (!note) return null;
 
   return (
-    <div className="flex justify-end">
-      <div
-        className="relative w-full max-w-sm rotate-[1.2deg] rounded-2xl border border-accent-soft/60 bg-gradient-to-br from-accent-soft/40 to-mint-soft/40 px-5 py-4 shadow-md"
-      >
+    <div className="flex justify-end xl:pointer-events-none xl:fixed xl:inset-y-0 xl:right-0 xl:flex xl:w-[calc((100vw-64rem)/2)] xl:max-w-[18rem] xl:items-start xl:justify-center xl:pt-32">
+      <div className="pointer-events-auto relative w-full max-w-sm rotate-[2deg] rounded-2xl border border-accent-soft/60 bg-gradient-to-br from-accent-soft/50 to-mint-soft/40 px-5 py-4 shadow-lg xl:max-w-[16rem]">
         {/* tape */}
         <span
           aria-hidden

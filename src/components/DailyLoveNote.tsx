@@ -1,8 +1,12 @@
 import { Heart } from "lucide-react";
 import { getNoteForDate } from "@/lib/love-notes";
 
-export async function DailyLoveNote() {
-  const note = await getNoteForDate();
+type DailyLoveNoteProps = {
+  customNotes?: string[];
+};
+
+export async function DailyLoveNote({ customNotes = [] }: DailyLoveNoteProps) {
+  const note = await getNoteForDate(customNotes);
   if (!note) return null;
 
   return (

@@ -26,3 +26,24 @@ export async function fetchKnightSpecialDates(): Promise<SpecialDate[]> {
     return [];
   }
 }
+
+/**
+ * Fetch the Knight's curated love notes. Princess reads this for her daily
+ * note. When empty, callers should fall back to the seed JSON.
+ */
+export async function fetchKnightLoveNotes(): Promise<string[]> {
+  if (!envConfigured()) return [];
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase
+      .from("profiles")
+      .select("love_notes")
+      .eq("role", "KNIGHT")
+      .maybeSingle();
+    const raw = data?.love_notes;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+  } catch {
+    return [];
+  }
+}

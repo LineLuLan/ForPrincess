@@ -28,6 +28,11 @@ create table if not exists profiles (
 alter table profiles
   add column if not exists special_dates jsonb not null default '[]'::jsonb;
 
+-- Knight-curated daily love notes. Format: ["Hôm nay anh nhớ em", ...]
+-- When empty, the app falls back to the seed in public/love-notes.json.
+alter table profiles
+  add column if not exists love_notes jsonb not null default '[]'::jsonb;
+
 -- wish_items --------------------------------------------
 create table if not exists wish_items (
   id          uuid primary key default gen_random_uuid(),

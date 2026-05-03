@@ -11,10 +11,16 @@ import { type WishItem } from "@/types/wish";
 type PrincessHomeProps = {
   items: WishItem[];
   specialDates: SpecialDate[];
+  loveNotes: string[];
   viewerId: string | null;
 };
 
-export function PrincessHome({ items, specialDates, viewerId }: PrincessHomeProps) {
+export function PrincessHome({
+  items,
+  specialDates,
+  loveNotes,
+  viewerId,
+}: PrincessHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-10">
@@ -51,7 +57,7 @@ export function PrincessHome({ items, specialDates, viewerId }: PrincessHomeProp
           </div>
         </header>
 
-        <DailyLoveNote />
+        <DailyLoveNote customNotes={loveNotes} />
 
         <AddWishConnected />
 

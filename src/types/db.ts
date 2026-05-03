@@ -23,6 +23,7 @@ export interface Database {
           display_name: string | null;
           role: UserRole;
           special_dates: Json;
+          love_notes: Json;
           created_at: string | null;
         };
         Insert: {
@@ -30,6 +31,7 @@ export interface Database {
           display_name?: string | null;
           role: UserRole;
           special_dates?: Json;
+          love_notes?: Json;
           created_at?: string | null;
         };
         Update: {
@@ -37,6 +39,7 @@ export interface Database {
           display_name?: string | null;
           role?: UserRole;
           special_dates?: Json;
+          love_notes?: Json;
           created_at?: string | null;
         };
         Relationships: [];

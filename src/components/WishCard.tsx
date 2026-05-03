@@ -22,16 +22,23 @@ const PRIORITY_TONE: Record<WishPriority, string> = {
 type WishCardProps = {
   item: WishItem;
   viewerRole?: UserRole;
+  viewerId?: string | null;
   actionsSlot?: React.ReactNode;
 };
 
-export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCardProps) {
+export function WishCard({
+  item,
+  viewerRole = "PRINCESS",
+  viewerId = null,
+  actionsSlot,
+}: WishCardProps) {
   const price = formatPrice(item.price, item.currency);
   const giftedOn = formatGiftedDate(item.gifted_at);
   const isKnight = viewerRole === "KNIGHT";
-  // Knight can always edit. Princess can only edit non-gifted wishes
-  // (her RLS policy forbids touching is_gifted=true rows).
-  const canEdit = isKnight || !item.is_gifted;
+  const isOwner = viewerId != null && item.created_by === viewerId;
+  // Knight always sees an action button; Princess sees one too — edit if she's
+  // the owner, otherwise read-only view. Either way we render the dialog.
+  const dialogMode: "edit" | "view" = isKnight || isOwner ? "edit" : "view";
 
   return (
     <motion.article
@@ -43,7 +50,12 @@ export function WishCard({ item, viewerRole = "PRINCESS", actionsSlot }: WishCar
     >
       {item.is_gifted && <GiftedRibbon />}
       {isKnight && item.is_secretly_buying && !item.is_gifted && <SecretRibbon />}
-      {canEdit && <EditWishDialog item={item} viewerRole={viewerRole} />}
+      <EditWishDialog
+        item={item}
+        viewerRole={viewerRole}
+        viewerId={viewerId}
+        mode={dialogMode}
+      />
 
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-soft">
         {item.image_url ? (

@@ -11,9 +11,10 @@ import { type WishItem } from "@/types/wish";
 type PrincessHomeProps = {
   items: WishItem[];
   specialDates: SpecialDate[];
+  viewerId: string | null;
 };
 
-export function PrincessHome({ items, specialDates }: PrincessHomeProps) {
+export function PrincessHome({ items, specialDates, viewerId }: PrincessHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-10">
@@ -56,7 +57,7 @@ export function PrincessHome({ items, specialDates }: PrincessHomeProps) {
         {items.length === 0 ? (
           <EmptyState />
         ) : (
-          <WishGrid viewerRole="PRINCESS" density="airy" />
+          <WishGrid viewerRole="PRINCESS" viewerId={viewerId} density="airy" />
         )}
       </div>
     </WishListProvider>

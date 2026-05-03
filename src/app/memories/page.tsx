@@ -18,6 +18,7 @@ export default async function MemoriesPage() {
   ]);
 
   const role = viewer?.role ?? "PRINCESS";
+  const viewerId = viewer?.userId ?? null;
   const items = fetched.items;
 
   return (
@@ -44,7 +45,7 @@ export default async function MemoriesPage() {
       ) : (
         <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
-            <WishCard key={item.id} item={item} viewerRole={role} />
+            <WishCard key={item.id} item={item} viewerRole={role} viewerId={viewerId} />
           ))}
         </section>
       )}

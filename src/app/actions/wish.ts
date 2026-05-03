@@ -128,6 +128,25 @@ export async function unmarkGifted(wishId: string): Promise<ActionResult> {
   return { ok: true };
 }
 
+export async function deleteWish(wishId: string): Promise<ActionResult> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
+
+  if (!z.string().uuid().safeParse(wishId).success) {
+    return { ok: false, message: "Dữ liệu chưa hợp lệ." };
+  }
+
+  // RLS enforces ownership: Princess can only delete her own; Knight can delete any.
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("wish_items").delete().eq("id", wishId);
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/memories");
+  revalidatePath("/stats");
+  return { ok: true };
+}
+
 const updateWishInput = z.object({
   wishId: z.string().uuid(),
   title: z.string().trim().min(1).max(120).optional(),

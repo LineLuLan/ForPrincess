@@ -11,9 +11,10 @@ import { type WishItem } from "@/types/wish";
 type KnightHomeProps = {
   items: WishItem[];
   specialDates: SpecialDate[];
+  viewerId: string | null;
 };
 
-export function KnightHome({ items, specialDates }: KnightHomeProps) {
+export function KnightHome({ items, specialDates, viewerId }: KnightHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-6">
@@ -52,7 +53,7 @@ export function KnightHome({ items, specialDates }: KnightHomeProps) {
             description="Khi nàng thêm điều đầu tiên, nó sẽ xuất hiện ở đây."
           />
         ) : (
-          <WishGrid viewerRole="KNIGHT" density="dense" />
+          <WishGrid viewerRole="KNIGHT" viewerId={viewerId} density="dense" />
         )}
       </div>
     </WishListProvider>

@@ -93,10 +93,11 @@ export function WishListProvider({
 
 type WishGridProps = {
   viewerRole: UserRole;
+  viewerId?: string | null;
   density?: "airy" | "dense";
 };
 
-export function WishGrid({ viewerRole, density = "airy" }: WishGridProps) {
+export function WishGrid({ viewerRole, viewerId = null, density = "airy" }: WishGridProps) {
   const { items } = useWishGrid();
   const isKnight = viewerRole === "KNIGHT";
   const gridClass =
@@ -130,6 +131,7 @@ export function WishGrid({ viewerRole, density = "airy" }: WishGridProps) {
             <WishCard
               item={item}
               viewerRole={viewerRole}
+              viewerId={viewerId}
               actionsSlot={
                 isKnight && !isOptimistic ? <KnightActions item={item} /> : undefined
               }

@@ -23,11 +23,13 @@ export default async function HomePage() {
       </div>
     ) : null;
 
+  const viewerId = viewer?.userId ?? null;
+
   if (role === "KNIGHT") {
     return (
       <div className="flex flex-col gap-6">
         {banner}
-        <KnightHome items={items} specialDates={specialDates} />
+        <KnightHome items={items} specialDates={specialDates} viewerId={viewerId} />
       </div>
     );
   }
@@ -35,7 +37,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-6">
       {banner}
-      <PrincessHome items={items} specialDates={specialDates} />
+      <PrincessHome items={items} specialDates={specialDates} viewerId={viewerId} />
     </div>
   );
 }

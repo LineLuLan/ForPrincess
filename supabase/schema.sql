@@ -123,17 +123,17 @@ create policy "knight_updates" on wish_items
     (select role from profiles where id = auth.uid()) = 'KNIGHT'
   );
 
--- Princess can update wishes she created, but can't change Knight-only fields.
+-- Princess can update wishes she created. She CAN edit content of already-gifted
+-- items (title/note/etc), but the WITH CHECK clause stops her from flipping the
+-- secret/gifted flags herself — those remain Knight-controlled.
 drop policy if exists "princess_updates_own_safe_fields" on wish_items;
 create policy "princess_updates_own_safe_fields" on wish_items
   for update using (
     (select role from profiles where id = auth.uid()) = 'PRINCESS'
     and created_by = auth.uid()
     and is_secretly_buying = false
-    and is_gifted = false
   ) with check (
     is_secretly_buying = false
-    and is_gifted = false
   );
 
 -- Knight can delete (cleanups, mistakes).
@@ -141,4 +141,12 @@ drop policy if exists "knight_deletes" on wish_items;
 create policy "knight_deletes" on wish_items
   for delete using (
     (select role from profiles where id = auth.uid()) = 'KNIGHT'
+  );
+
+-- Princess can delete wishes she created (so she can clean up her own list).
+drop policy if exists "princess_deletes_own" on wish_items;
+create policy "princess_deletes_own" on wish_items
+  for delete using (
+    (select role from profiles where id = auth.uid()) = 'PRINCESS'
+    and created_by = auth.uid()
   );

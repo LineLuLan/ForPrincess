@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 const HEART_COUNT = 7;
 
@@ -28,8 +28,12 @@ function makeHearts(): Heart[] {
 }
 
 export function FloatingHearts() {
-  // Stable per render — random positions but consistent across rerenders.
-  const hearts = useMemo(makeHearts, []);
+  // Generate only after mount to avoid SSR/CSR mismatch from Math.random().
+  const [hearts, setHearts] = useState<Heart[]>([]);
+
+  useEffect(() => {
+    setHearts(makeHearts());
+  }, []);
 
   return (
     <div
@@ -46,7 +50,6 @@ export function FloatingHearts() {
             opacity: h.opacity,
             animationDelay: h.delay,
             animationDuration: h.duration,
-            // CSS custom prop drives horizontal drift inside the keyframe.
             ["--drift" as string]: h.drift,
           }}
         >

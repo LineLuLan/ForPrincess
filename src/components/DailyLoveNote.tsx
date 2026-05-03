@@ -6,20 +6,30 @@ export async function DailyLoveNote() {
   if (!note) return null;
 
   return (
-    <div className="relative mx-auto max-w-xl rounded-3xl border border-accent-soft/60 bg-accent-soft/30 px-6 py-5 text-center shadow-sm">
-      <Heart
-        aria-hidden
-        className="absolute -left-2 -top-2 h-5 w-5 fill-accent stroke-accent drop-shadow-sm"
-      />
-      <p
-        className="font-[family-name:var(--font-script)] text-2xl leading-snug text-accent sm:text-3xl"
-        style={{ fontFamily: "var(--font-caveat)" }}
+    <div className="flex justify-end">
+      <div
+        className="relative w-full max-w-sm rotate-[1.2deg] rounded-2xl border border-accent-soft/60 bg-gradient-to-br from-accent-soft/40 to-mint-soft/40 px-5 py-4 shadow-md"
       >
-        {note}
-      </p>
-      <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted">
-        Lời nhắn hôm nay
-      </p>
+        {/* tape */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-2 left-1/2 h-3 w-12 -translate-x-1/2 -rotate-3 rounded-sm bg-white/70 shadow-sm"
+        />
+        <div className="flex items-start gap-2">
+          <Heart aria-hidden className="mt-1 h-3.5 w-3.5 shrink-0 fill-accent stroke-accent" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
+              Lời nhắn hôm nay
+            </span>
+            <p
+              className="font-[family-name:var(--font-script)] text-xl leading-snug text-accent sm:text-2xl"
+              style={{ fontFamily: "var(--font-caveat)" }}
+            >
+              {note}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

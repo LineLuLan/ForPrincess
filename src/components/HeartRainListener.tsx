@@ -1,21 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Heart } from "lucide-react";
 import { rainHearts } from "@/lib/confetti";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 const SEEN_KEY = "fp.last-ping-seen";
+const TOAST_DURATION_MS = 6000;
 
-/**
- * Subscribes to ping inserts. When a fresh one arrives, rains hearts on screen.
- * Also fires once for the latest ping if it's newer than what we've seen
- * (covers the case where Princess opened the app right after Knight pinged).
- */
+type ToastState = { id: string; message: string } | null;
+
 export function HeartRainListener() {
+  const [toast, setToast] = useState<ToastState>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     let cancelled = false;
+    let toastTimeout: ReturnType<typeof setTimeout> | null = null;
     const supabase = createSupabaseBrowserClient();
+
+    const showToast = (message: string | null) => {
+      if (!message) return;
+      const id = String(Date.now());
+      setToast({ id, message });
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => setToast(null), TOAST_DURATION_MS);
+    };
 
     const lastSeen = (() => {
       try {
@@ -30,24 +40,25 @@ export function HeartRainListener() {
       try {
         window.localStorage.setItem(SEEN_KEY, iso);
       } catch {
-        /* storage full / private mode — ignore */
+        /* ignore */
       }
     };
 
-    // Catch-up: rain once if there's a recent ping we haven't seen.
     void (async () => {
       const { data } = await supabase
         .from("pings")
-        .select("created_at")
+        .select("created_at, message")
         .order("created_at", { ascending: false })
         .limit(1);
       if (cancelled) return;
-      const latest = data?.[0]?.created_at;
-      if (latest && new Date(latest).getTime() > lastSeen) {
-        // Only auto-rain if the ping is fresh (< 5 min old) to avoid replays.
-        const age = Date.now() - new Date(latest).getTime();
-        if (age < 5 * 60 * 1000) rainHearts();
-        markSeen(latest);
+      const latest = data?.[0];
+      if (latest?.created_at && new Date(latest.created_at).getTime() > lastSeen) {
+        const age = Date.now() - new Date(latest.created_at).getTime();
+        if (age < 5 * 60 * 1000) {
+          rainHearts();
+          showToast(latest.message ?? null);
+        }
+        markSeen(latest.created_at);
       }
     })();
 
@@ -57,8 +68,12 @@ export function HeartRainListener() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "pings" },
         (payload) => {
-          const row = payload.new as { created_at?: string } | null;
+          const row = payload.new as {
+            created_at?: string;
+            message?: string | null;
+          } | null;
           rainHearts();
+          showToast(row?.message ?? null);
           if (row?.created_at) markSeen(row.created_at);
         },
       )
@@ -66,9 +81,31 @@ export function HeartRainListener() {
 
     return () => {
       cancelled = true;
+      if (toastTimeout) clearTimeout(toastTimeout);
       void supabase.removeChannel(channel);
     };
   }, []);
 
-  return null;
+  if (!toast) return null;
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-24 z-50 flex justify-center px-4">
+      <div className="pointer-events-auto flex max-w-md items-start gap-3 rounded-2xl border border-accent-soft/70 bg-white/95 px-5 py-4 shadow-2xl backdrop-blur animate-[ping-pop_400ms_ease-out]">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+          <Heart className="h-4 w-4 fill-accent stroke-accent" />
+        </span>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
+            Chàng vừa gửi
+          </span>
+          <p
+            className="font-[family-name:var(--font-script)] text-xl leading-snug text-accent"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            {toast.message}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

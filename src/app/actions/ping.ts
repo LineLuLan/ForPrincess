@@ -1,24 +1,38 @@
 "use server";
 
+import { z } from "zod";
 import { getViewer } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const COOLDOWN_MS = 15 * 60 * 1000;
+const MAX_MESSAGE = 200;
 
 export type PingResult =
   | { ok: true }
   | { ok: false; message: string; retryInSeconds?: number };
 
-export async function sendHeartPing(): Promise<PingResult> {
+const pingInput = z.object({
+  message: z.string().trim().max(MAX_MESSAGE).optional(),
+});
+
+export async function sendHeartPing(rawMessage?: string): Promise<PingResult> {
   const viewer = await getViewer();
   if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
   if (viewer.role !== "KNIGHT") {
     return { ok: false, message: "Tính năng này chỉ Knight mới dùng được 🛡️" };
   }
 
+  const parsed = pingInput.safeParse({ message: rawMessage });
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: parsed.error.issues[0]?.message ?? "Lời nhắn quá dài.",
+    };
+  }
+  const message = parsed.data.message?.trim() || null;
+
   const supabase = await createSupabaseServerClient();
 
-  // Cooldown: refuse if the latest ping from this Knight is < 15 min old.
   const { data: latest } = await supabase
     .from("pings")
     .select("created_at")
@@ -40,7 +54,7 @@ export async function sendHeartPing(): Promise<PingResult> {
 
   const { error } = await supabase
     .from("pings")
-    .insert({ from_user: viewer.userId, type: "heart" });
+    .insert({ from_user: viewer.userId, type: "heart", message });
 
   if (error) return { ok: false, message: error.message };
   return { ok: true };

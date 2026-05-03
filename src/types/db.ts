@@ -49,18 +49,21 @@ export interface Database {
           id: string;
           from_user: string;
           type: string;
+          message: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           from_user: string;
           type?: string;
+          message?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           from_user?: string;
           type?: string;
+          message?: string | null;
           created_at?: string;
         };
         Relationships: [

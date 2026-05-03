@@ -163,8 +163,12 @@ create table if not exists pings (
   id          uuid primary key default gen_random_uuid(),
   from_user   uuid not null references profiles(id) on delete cascade,
   type        text not null default 'heart',
+  message     text,
   created_at  timestamptz not null default now()
 );
+
+-- Idempotent: add message column to existing pings table.
+alter table pings add column if not exists message text;
 
 create index if not exists idx_pings_recent on pings(created_at desc);
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Caveat, JetBrains_Mono, Quicksand } from "next/font/google";
+import { Dancing_Script, JetBrains_Mono, Quicksand } from "next/font/google";
 import { HeartRainListener } from "@/components/HeartRainListener";
 import { Navbar } from "@/components/Navbar";
 import { NavbarUser } from "@/components/NavbarUser";
@@ -13,9 +13,9 @@ const quicksand = Quicksand({
   weight: ["400", "500", "600", "700"],
 });
 
-const caveat = Caveat({
+const dancingScript = Dancing_Script({
   variable: "--font-caveat",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
 });
 
@@ -47,7 +47,7 @@ export default async function RootLayout({
     <html
       lang="vi"
       data-role={role}
-      className={`${quicksand.variable} ${caveat.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${quicksand.variable} ${dancingScript.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {viewer?.role === "PRINCESS" && <HeartRainListener />}

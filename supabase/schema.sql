@@ -23,6 +23,11 @@ create table if not exists profiles (
   created_at    timestamptz default now()
 );
 
+-- Idempotent: add special_dates jsonb if missing.
+-- Format: [{ "label": "Sinh nhật em", "date": "2026-08-05" }, ...]
+alter table profiles
+  add column if not exists special_dates jsonb not null default '[]'::jsonb;
+
 -- wish_items --------------------------------------------
 create table if not exists wish_items (
   id          uuid primary key default gen_random_uuid(),
@@ -68,10 +73,17 @@ create trigger trg_wish_items_updated_at
 alter table profiles    enable row level security;
 alter table wish_items  enable row level security;
 
--- Each user can read their own profile (Knight reads Princess too via auth — kept simple here).
+-- Any authenticated user can read profiles (only 2 rows total — Knight & Princess).
+-- Princess needs to read Knight's special_dates to render the countdown widget.
 drop policy if exists "profiles_self_select" on profiles;
-create policy "profiles_self_select" on profiles
-  for select using (auth.uid() = id);
+drop policy if exists "profiles_authed_select" on profiles;
+create policy "profiles_authed_select" on profiles
+  for select using (auth.uid() is not null);
+
+-- Each user updates only their own profile (display_name, special_dates).
+drop policy if exists "profiles_self_update" on profiles;
+create policy "profiles_self_update" on profiles
+  for update using (auth.uid() = id) with check (auth.uid() = id);
 
 -- Princess: only sees rows that are NOT secretly being bought.
 drop policy if exists "princess_sees_non_secret" on wish_items;

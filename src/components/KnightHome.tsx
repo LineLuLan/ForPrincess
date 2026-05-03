@@ -1,15 +1,19 @@
 import { Shield, TerminalSquare } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
+import { Countdown } from "@/components/Countdown";
 import { EmptyState } from "@/components/EmptyState";
 import { KpiBar } from "@/components/KpiBar";
+import { SpecialDatesDialog } from "@/components/SpecialDatesDialog";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
+import type { SpecialDate } from "@/lib/countdown";
 import { type WishItem } from "@/types/wish";
 
 type KnightHomeProps = {
   items: WishItem[];
+  specialDates: SpecialDate[];
 };
 
-export function KnightHome({ items }: KnightHomeProps) {
+export function KnightHome({ items, specialDates }: KnightHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-6">
@@ -27,8 +31,14 @@ export function KnightHome({ items }: KnightHomeProps) {
             </p>
           </div>
 
-          <div className="font-mono text-[11px] text-muted tabular-nums">
-            last sync · {new Date().toLocaleTimeString("vi-VN")}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              <Countdown dates={specialDates} tone="knight" />
+              <SpecialDatesDialog initial={specialDates} />
+            </div>
+            <div className="font-mono text-[11px] text-muted tabular-nums">
+              last sync · {new Date().toLocaleTimeString("vi-VN")}
+            </div>
           </div>
         </header>
 

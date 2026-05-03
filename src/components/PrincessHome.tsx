@@ -1,16 +1,19 @@
 import { Sparkles } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
+import { Countdown } from "@/components/Countdown";
 import { DailyLoveNote } from "@/components/DailyLoveNote";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
+import type { SpecialDate } from "@/lib/countdown";
 import { type WishItem } from "@/types/wish";
 
 type PrincessHomeProps = {
   items: WishItem[];
+  specialDates: SpecialDate[];
 };
 
-export function PrincessHome({ items }: PrincessHomeProps) {
+export function PrincessHome({ items, specialDates }: PrincessHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-10">
@@ -21,9 +24,12 @@ export function PrincessHome({ items }: PrincessHomeProps) {
           <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-accent-soft/60 blur-3xl" />
 
           <div className="relative flex flex-col gap-3">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-mint-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
-              <Sparkles className="h-3 w-3" /> Hộp ước mơ
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-mint-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
+                <Sparkles className="h-3 w-3" /> Hộp ước mơ
+              </span>
+              <Countdown dates={specialDates} tone="princess" />
+            </div>
             <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl">
               Những điều em đang mong{" "}
               <span className="font-[family-name:var(--font-script)] text-4xl text-accent sm:text-5xl">

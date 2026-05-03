@@ -22,18 +22,21 @@ export interface Database {
           id: string;
           display_name: string | null;
           role: UserRole;
+          special_dates: Json;
           created_at: string | null;
         };
         Insert: {
           id: string;
           display_name?: string | null;
           role: UserRole;
+          special_dates?: Json;
           created_at?: string | null;
         };
         Update: {
           id?: string;
           display_name?: string | null;
           role?: UserRole;
+          special_dates?: Json;
           created_at?: string | null;
         };
         Relationships: [];

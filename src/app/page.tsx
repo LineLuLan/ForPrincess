@@ -1,14 +1,16 @@
 import { KnightHome } from "@/components/KnightHome";
 import { PrincessHome } from "@/components/PrincessHome";
 import { getViewer } from "@/lib/auth";
+import { fetchKnightSpecialDates } from "@/lib/profile-queries";
 import { fetchVisibleWishes } from "@/lib/wish-queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [viewer, fetched] = await Promise.all([
+  const [viewer, fetched, specialDates] = await Promise.all([
     getViewer(),
     fetchVisibleWishes(),
+    fetchKnightSpecialDates(),
   ]);
 
   const role = viewer?.role ?? "PRINCESS";
@@ -25,7 +27,7 @@ export default async function HomePage() {
     return (
       <div className="flex flex-col gap-6">
         {banner}
-        <KnightHome items={items} />
+        <KnightHome items={items} specialDates={specialDates} />
       </div>
     );
   }
@@ -33,7 +35,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-6">
       {banner}
-      <PrincessHome items={items} />
+      <PrincessHome items={items} specialDates={specialDates} />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { getPingCooldown } from "@/app/actions/ping";
 import { KnightHome } from "@/components/KnightHome";
 import { PrincessHome } from "@/components/PrincessHome";
 import { getViewer } from "@/lib/auth";
@@ -7,10 +8,11 @@ import { fetchVisibleWishes } from "@/lib/wish-queries";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [viewer, fetched, specialDates] = await Promise.all([
+  const [viewer, fetched, specialDates, pingCooldownMs] = await Promise.all([
     getViewer(),
     fetchVisibleWishes(),
     fetchKnightSpecialDates(),
+    getPingCooldown(),
   ]);
 
   const role = viewer?.role ?? "PRINCESS";
@@ -29,7 +31,12 @@ export default async function HomePage() {
     return (
       <div className="flex flex-col gap-6">
         {banner}
-        <KnightHome items={items} specialDates={specialDates} viewerId={viewerId} />
+        <KnightHome
+          items={items}
+          specialDates={specialDates}
+          viewerId={viewerId}
+          pingCooldownMs={pingCooldownMs}
+        />
       </div>
     );
   }

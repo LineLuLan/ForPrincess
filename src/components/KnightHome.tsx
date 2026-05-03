@@ -2,6 +2,7 @@ import { Shield, TerminalSquare } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
 import { Countdown } from "@/components/Countdown";
 import { EmptyState } from "@/components/EmptyState";
+import { HeartRainButton } from "@/components/HeartRainButton";
 import { KpiBar } from "@/components/KpiBar";
 import { SpecialDatesDialog } from "@/components/SpecialDatesDialog";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
@@ -12,9 +13,15 @@ type KnightHomeProps = {
   items: WishItem[];
   specialDates: SpecialDate[];
   viewerId: string | null;
+  pingCooldownMs: number;
 };
 
-export function KnightHome({ items, specialDates, viewerId }: KnightHomeProps) {
+export function KnightHome({
+  items,
+  specialDates,
+  viewerId,
+  pingCooldownMs,
+}: KnightHomeProps) {
   return (
     <WishListProvider initialItems={items}>
       <div className="flex flex-col gap-6">
@@ -56,6 +63,7 @@ export function KnightHome({ items, specialDates, viewerId }: KnightHomeProps) {
           <WishGrid viewerRole="KNIGHT" viewerId={viewerId} density="dense" />
         )}
       </div>
+      <HeartRainButton initialCooldownMs={pingCooldownMs} />
     </WishListProvider>
   );
 }

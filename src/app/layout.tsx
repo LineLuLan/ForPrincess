@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Caveat, JetBrains_Mono, Quicksand } from "next/font/google";
+import { HeartRainListener } from "@/components/HeartRainListener";
 import { Navbar } from "@/components/Navbar";
 import { NavbarUser } from "@/components/NavbarUser";
 import { getViewer } from "@/lib/auth";
@@ -49,6 +50,7 @@ export default async function RootLayout({
       className={`${quicksand.variable} ${caveat.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {viewer?.role === "PRINCESS" && <HeartRainListener />}
         <Navbar roleSlot={<NavbarUser />} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
           {children}

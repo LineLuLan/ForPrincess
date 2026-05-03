@@ -150,3 +150,46 @@ create policy "princess_deletes_own" on wish_items
     (select role from profiles where id = auth.uid()) = 'PRINCESS'
     and created_by = auth.uid()
   );
+
+-- pings ------------------------------------------------
+-- Tiny ephemeral table — Knight presses "anh nhớ em" → row inserted →
+-- Princess's Realtime subscription rains hearts for a few seconds.
+create table if not exists pings (
+  id          uuid primary key default gen_random_uuid(),
+  from_user   uuid not null references profiles(id) on delete cascade,
+  type        text not null default 'heart',
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists idx_pings_recent on pings(created_at desc);
+
+alter table pings enable row level security;
+
+-- Knight inserts only as themself.
+drop policy if exists "knight_inserts_pings" on pings;
+create policy "knight_inserts_pings" on pings
+  for insert with check (
+    (select role from profiles where id = auth.uid()) = 'KNIGHT'
+    and from_user = auth.uid()
+  );
+
+-- Either user can read recent pings (so Princess's Realtime sub fires).
+drop policy if exists "pings_authed_select" on pings;
+create policy "pings_authed_select" on pings
+  for select using (auth.uid() is not null);
+
+-- Make sure Realtime publishes ping inserts (idempotent).
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    if not exists (
+      select 1
+      from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'pings'
+    ) then
+      execute 'alter publication supabase_realtime add table pings';
+    end if;
+  end if;
+end$$;

@@ -41,6 +41,34 @@ export interface Database {
         };
         Relationships: [];
       };
+      pings: {
+        Row: {
+          id: string;
+          from_user: string;
+          type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          from_user: string;
+          type?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          from_user?: string;
+          type?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pings_from_user_fkey";
+            columns: ["from_user"];
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       wish_items: {
         Row: {
           id: string;

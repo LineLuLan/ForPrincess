@@ -40,7 +40,6 @@ export function KnightHome({ items }: KnightHomeProps) {
           <EmptyState
             title="Chưa có điều ước nào"
             description="Khi nàng thêm điều đầu tiên, nó sẽ xuất hiện ở đây."
-            icon={<Shield className="h-6 w-6" />}
           />
         ) : (
           <WishGrid viewerRole="KNIGHT" density="dense" />

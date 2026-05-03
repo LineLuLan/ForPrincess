@@ -1,4 +1,4 @@
-import { Heart, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
@@ -45,9 +45,7 @@ export function PrincessHome({ items }: PrincessHomeProps) {
         <AddWishConnected />
 
         {items.length === 0 ? (
-          <EmptyState
-            icon={<Heart className="h-6 w-6 fill-accent stroke-accent" />}
-          />
+          <EmptyState />
         ) : (
           <WishGrid viewerRole="PRINCESS" density="airy" />
         )}

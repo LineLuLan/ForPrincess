@@ -29,6 +29,7 @@ export function Navbar({ roleSlot, signOutSlot }: NavbarProps) {
         <nav className="ml-2 hidden items-center gap-1 text-sm sm:flex">
           <NavLink href="/">Điều ước</NavLink>
           <NavLink href="/memories">Tủ kỷ niệm</NavLink>
+          <NavLink href="/stats">Thống kê</NavLink>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">

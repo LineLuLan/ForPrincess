@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { AddWishConnected } from "@/components/AddWishConnected";
+import { DailyLoveNote } from "@/components/DailyLoveNote";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
@@ -41,6 +42,8 @@ export function PrincessHome({ items }: PrincessHomeProps) {
             </p>
           </div>
         </header>
+
+        <DailyLoveNote />
 
         <AddWishConnected />
 

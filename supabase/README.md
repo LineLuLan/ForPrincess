@@ -29,6 +29,11 @@ It creates:
 - Public: **on** (we serve via the public CDN URL).
 - File size limit: 2 MB.
 
+After creating the bucket, **re-run [`schema.sql`](./schema.sql)** so the
+storage RLS policies at the bottom of the file get applied. "Public" only
+makes reads public — uploads still need an explicit `insert` policy on
+`storage.objects`, otherwise every upload gets rejected by RLS.
+
 ## 4. Auth
 
 **Authentication** → **Providers** → **Email**:

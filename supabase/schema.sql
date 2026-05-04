@@ -202,3 +202,28 @@ begin
     end if;
   end if;
 end$$;
+
+-- Storage policies — wish-images bucket -----------------
+-- "Public bucket" only makes objects publicly READable via the CDN URL;
+-- INSERT/UPDATE/DELETE on storage.objects still need explicit policies.
+-- Run after creating the bucket in Storage → New bucket.
+
+drop policy if exists "wish_images_authed_insert" on storage.objects;
+create policy "wish_images_authed_insert" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'wish-images');
+
+drop policy if exists "wish_images_authed_update" on storage.objects;
+create policy "wish_images_authed_update" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'wish-images')
+  with check (bucket_id = 'wish-images');
+
+drop policy if exists "wish_images_authed_delete" on storage.objects;
+create policy "wish_images_authed_delete" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'wish-images');
+
+drop policy if exists "wish_images_public_read" on storage.objects;
+create policy "wish_images_public_read" on storage.objects
+  for select using (bucket_id = 'wish-images');

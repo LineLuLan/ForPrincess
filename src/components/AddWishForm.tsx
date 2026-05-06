@@ -10,13 +10,21 @@ import {
   wishPriorityValues,
   type WishFormValues,
 } from "@/lib/wish-schema";
+import type { UploadStage } from "@/lib/image-upload";
 import { PRIORITY_LABEL, type WishPriority } from "@/types/wish";
 
 type AddWishFormProps = {
   onSubmit?: (values: WishFormValues, image: File | null) => Promise<void> | void;
+  stage?: UploadStage | null;
 };
 
-export function AddWishForm({ onSubmit }: AddWishFormProps) {
+const STAGE_LABEL: Record<UploadStage, string> = {
+  preparing: "Đang giải mã ảnh HEIC…",
+  compressing: "Đang nén ảnh…",
+  uploading: "Đang gửi ảnh lên…",
+};
+
+export function AddWishForm({ onSubmit, stage }: AddWishFormProps) {
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -202,7 +210,7 @@ export function AddWishForm({ onSubmit }: AddWishFormProps) {
           ) : (
             <Heart className="h-4 w-4 fill-white" />
           )}
-          Lưu điều ước
+          {stage ? STAGE_LABEL[stage] : "Lưu điều ước"}
         </button>
       </div>
     </form>

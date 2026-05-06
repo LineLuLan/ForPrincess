@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { AddWishForm } from "@/components/AddWishForm";
 import { addWish } from "@/app/actions/wish";
-import { compressAndUpload } from "@/lib/image-upload";
+import { compressAndUpload, type UploadStage } from "@/lib/image-upload";
 import { useWishGrid } from "@/components/WishGrid";
 import type { WishFormValues } from "@/lib/wish-schema";
 import type { WishItem } from "@/types/wish";
 
 export function AddWishConnected() {
   const [error, setError] = useState<string | null>(null);
+  const [stage, setStage] = useState<UploadStage | null>(null);
   const grid = useWishGrid();
 
   const onSubmit = async (values: WishFormValues, image: File | null) => {
@@ -18,8 +19,6 @@ export function AddWishConnected() {
     const tempId = `temp-${Date.now()}`;
     const previewUrl = image ? URL.createObjectURL(image) : null;
 
-    // Show the card instantly with the local preview image — feels snappy
-    // even before the upload + insert round-trip completes.
     const optimisticItem: WishItem = {
       id: tempId,
       title: values.title,
@@ -43,8 +42,9 @@ export function AddWishConnected() {
     try {
       let imageUrl: string | null = null;
       if (image) {
-        const upload = await compressAndUpload(image);
+        const upload = await compressAndUpload(image, { onStage: setStage });
         if (!upload.ok) {
+          grid.optimisticRemove(tempId);
           setError(upload.message);
           throw new Error(upload.message);
         }
@@ -62,13 +62,12 @@ export function AddWishConnected() {
       });
 
       if (!result.ok) {
+        grid.optimisticRemove(tempId);
         setError(result.message);
         throw new Error(result.message);
       }
-      // Server revalidatePath() will replace the optimistic temp-card with
-      // the real row on the next render — nothing to do here.
     } finally {
-      // Free the blob URL once we're past the optimistic preview window.
+      setStage(null);
       if (previewUrl) {
         setTimeout(() => URL.revokeObjectURL(previewUrl), 5000);
       }
@@ -77,7 +76,7 @@ export function AddWishConnected() {
 
   return (
     <div className="flex flex-col gap-2">
-      <AddWishForm onSubmit={onSubmit} />
+      <AddWishForm onSubmit={onSubmit} stage={stage} />
       {error && (
         <p className="rounded-2xl bg-accent-soft/50 px-3 py-2 text-xs text-accent">{error}</p>
       )}

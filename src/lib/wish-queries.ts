@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { WishItem } from "@/types/wish";
 import { MOCK_WISHES } from "@/lib/mock-data";
@@ -15,7 +16,7 @@ function envConfigured() {
   );
 }
 
-export async function fetchVisibleWishes(): Promise<WishFetchResult> {
+export const fetchVisibleWishes = cache(async (): Promise<WishFetchResult> => {
   if (!envConfigured()) {
     return {
       items: MOCK_WISHES,
@@ -45,7 +46,7 @@ export async function fetchVisibleWishes(): Promise<WishFetchResult> {
         e instanceof Error ? e.message : "Không kết nối được Supabase, dùng dữ liệu giả.",
     };
   }
-}
+});
 
 export type WishStats = {
   total: number;

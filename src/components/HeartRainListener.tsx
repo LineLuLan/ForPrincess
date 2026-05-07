@@ -10,7 +10,12 @@ const TOAST_DURATION_MS = 6000;
 
 type ToastState = { id: string; message: string } | null;
 
-export function HeartRainListener() {
+type HeartRainListenerProps = {
+  viewerId: string;
+  senderLabel: string;
+};
+
+export function HeartRainListener({ viewerId, senderLabel }: HeartRainListenerProps) {
   const [toast, setToast] = useState<ToastState>(null);
 
   useEffect(() => {
@@ -47,7 +52,8 @@ export function HeartRainListener() {
     void (async () => {
       const { data } = await supabase
         .from("pings")
-        .select("created_at, message")
+        .select("created_at, message, from_user")
+        .neq("from_user", viewerId)
         .order("created_at", { ascending: false })
         .limit(1);
       if (cancelled) return;
@@ -71,10 +77,12 @@ export function HeartRainListener() {
           const row = payload.new as {
             created_at?: string;
             message?: string | null;
+            from_user?: string;
           } | null;
+          if (!row || row.from_user === viewerId) return;
           rainHearts();
-          showToast(row?.message ?? null);
-          if (row?.created_at) markSeen(row.created_at);
+          showToast(row.message ?? null);
+          if (row.created_at) markSeen(row.created_at);
         },
       )
       .subscribe();
@@ -84,7 +92,7 @@ export function HeartRainListener() {
       if (toastTimeout) clearTimeout(toastTimeout);
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [viewerId]);
 
   if (!toast) return null;
 
@@ -96,7 +104,7 @@ export function HeartRainListener() {
         </span>
         <div className="flex flex-col">
           <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
-            Chàng vừa gửi
+            {senderLabel}
           </span>
           <p
             className="font-[family-name:var(--font-script)] text-xl leading-snug text-accent"

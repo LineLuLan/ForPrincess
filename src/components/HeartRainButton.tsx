@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Heart, Loader2, Send, X } from "lucide-react";
 import { sendHeartPing } from "@/app/actions/ping";
+import type { UserRole } from "@/types/wish";
 
 type HeartRainButtonProps = {
   initialCooldownMs: number;
+  role: UserRole;
 };
 
 function formatCountdown(ms: number): string {
@@ -15,14 +17,25 @@ function formatCountdown(ms: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-const SUGGESTIONS = [
+const KNIGHT_SUGGESTIONS = [
   "Anh nhớ em quá",
   "Em ăn cơm chưa?",
   "Đang nghĩ tới em",
   "Yêu em",
 ];
 
-export function HeartRainButton({ initialCooldownMs }: HeartRainButtonProps) {
+const PRINCESS_SUGGESTIONS = [
+  "Bé nhớ Na quá",
+  "Na ăn cơm chưa?",
+  "Đang nghĩ tới Na",
+  "Yêu Na",
+];
+
+export function HeartRainButton({ initialCooldownMs, role }: HeartRainButtonProps) {
+  const idleLabel = role === "KNIGHT" ? "Anh nhớ em" : "Bé nhớ Na";
+  const placeholder =
+    role === "KNIGHT" ? "Hôm nay anh nhớ em quá..." : "Hôm nay bé nhớ Na quá...";
+  const SUGGESTIONS = role === "KNIGHT" ? KNIGHT_SUGGESTIONS : PRINCESS_SUGGESTIONS;
   const [readyAt, setReadyAt] = useState<number>(() => Date.now() + initialCooldownMs);
   const [now, setNow] = useState<number>(() => Date.now());
   const [open, setOpen] = useState(false);
@@ -92,7 +105,7 @@ export function HeartRainButton({ initialCooldownMs }: HeartRainButtonProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={200}
-            placeholder="Hôm nay anh nhớ em quá..."
+            placeholder={placeholder}
             className="block w-full resize-none rounded-xl border border-border bg-surface-soft px-3 py-2 text-sm text-foreground placeholder:text-muted/70 outline-none focus:border-accent focus:ring-2 focus:ring-ring/40"
           />
           <div className="mt-2 flex flex-wrap gap-1">
@@ -135,14 +148,14 @@ export function HeartRainButton({ initialCooldownMs }: HeartRainButtonProps) {
         }}
         disabled={onCooldown || pending}
         className="group inline-flex items-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
-        aria-label="Gửi mưa tim cho nàng"
+        aria-label={role === "KNIGHT" ? "Gửi mưa tim cho nàng" : "Gửi mưa tim cho chàng"}
       >
         {pending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Heart className="h-4 w-4 fill-white" />
         )}
-        <span>{onCooldown ? formatCountdown(remaining) : "Anh nhớ em"}</span>
+        <span>{onCooldown ? formatCountdown(remaining) : idleLabel}</span>
       </button>
     </div>
   );

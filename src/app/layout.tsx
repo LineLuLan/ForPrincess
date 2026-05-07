@@ -51,12 +51,13 @@ export default async function RootLayout({
       className={`${quicksand.variable} ${dancingScript.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {viewer?.role === "PRINCESS" && (
-          <>
-            <HeartRainListener />
-            <LetterListener />
-          </>
+        {viewer && (
+          <HeartRainListener
+            viewerId={viewer.userId}
+            senderLabel={viewer.role === "KNIGHT" ? "Nàng vừa gửi" : "Chàng vừa gửi"}
+          />
         )}
+        {viewer?.role === "PRINCESS" && <LetterListener />}
         <Navbar roleSlot={<NavbarUser />} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
           {children}

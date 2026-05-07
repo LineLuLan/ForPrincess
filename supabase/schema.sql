@@ -174,11 +174,12 @@ create index if not exists idx_pings_recent on pings(created_at desc);
 
 alter table pings enable row level security;
 
--- Knight inserts only as themself.
+-- Either role can send a ping, but only as themself.
 drop policy if exists "knight_inserts_pings" on pings;
-create policy "knight_inserts_pings" on pings
+drop policy if exists "authed_inserts_pings" on pings;
+create policy "authed_inserts_pings" on pings
   for insert with check (
-    (select role from profiles where id = auth.uid()) = 'KNIGHT'
+    auth.uid() is not null
     and from_user = auth.uid()
   );
 

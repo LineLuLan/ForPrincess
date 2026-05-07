@@ -4,6 +4,7 @@ import { CalendarCountdown } from "@/components/CalendarCountdown";
 import { DailyLoveNote } from "@/components/DailyLoveNote";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
+import { HeartRainButton } from "@/components/HeartRainButton";
 import { LetterCardClient } from "@/components/LetterCardClient";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
 import type { SpecialDate } from "@/lib/countdown";
@@ -16,6 +17,7 @@ type PrincessHomeProps = {
   loveNotes: string[];
   viewerId: string | null;
   activeLetter: ActiveLetter | null;
+  pingCooldownMs: number;
 };
 
 export function PrincessHome({
@@ -24,6 +26,7 @@ export function PrincessHome({
   loveNotes,
   viewerId,
   activeLetter,
+  pingCooldownMs,
 }: PrincessHomeProps) {
   return (
     <WishListProvider initialItems={items}>
@@ -83,6 +86,7 @@ export function PrincessHome({
           <WishGrid viewerRole="PRINCESS" viewerId={viewerId} density="airy" />
         )}
       </div>
+      <HeartRainButton initialCooldownMs={pingCooldownMs} role="PRINCESS" />
     </WishListProvider>
   );
 }

@@ -59,6 +59,7 @@ export default async function HomePage() {
         loveNotes={loveNotes}
         viewerId={viewerId}
         activeLetter={activeLetter}
+        pingCooldownMs={pingCooldownMs}
       />
     </div>
   );

@@ -85,7 +85,7 @@ export function KnightHome({
           <WishGrid viewerRole="KNIGHT" viewerId={viewerId} density="dense" />
         )}
       </div>
-      <HeartRainButton initialCooldownMs={pingCooldownMs} />
+      <HeartRainButton initialCooldownMs={pingCooldownMs} role="KNIGHT" />
     </WishListProvider>
   );
 }

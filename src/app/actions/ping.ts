@@ -18,9 +18,6 @@ const pingInput = z.object({
 export async function sendHeartPing(rawMessage?: string): Promise<PingResult> {
   const viewer = await getViewer();
   if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
-  if (viewer.role !== "KNIGHT") {
-    return { ok: false, message: "Tính năng này chỉ Knight mới dùng được 🛡️" };
-  }
 
   const parsed = pingInput.safeParse({ message: rawMessage });
   if (!parsed.success) {
@@ -63,7 +60,7 @@ export async function sendHeartPing(rawMessage?: string): Promise<PingResult> {
 /** Returns ms until the next ping is allowed. 0 means ready now. */
 export async function getPingCooldown(): Promise<number> {
   const viewer = await getViewer();
-  if (!viewer || viewer.role !== "KNIGHT") return 0;
+  if (!viewer) return 0;
 
   const supabase = await createSupabaseServerClient();
   const { data: latest } = await supabase

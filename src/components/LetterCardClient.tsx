@@ -9,6 +9,7 @@ type LetterCardClientProps = {
     id: string;
     title: string | null;
     body: string;
+    startsAt: string;
     expiresAt: string;
   };
   viewerRole: UserRole;
@@ -21,6 +22,16 @@ function formatRemaining(ms: number): string {
   const minutes = totalMinutes % 60;
   if (hours <= 0) return `Còn ${minutes}m`;
   return `Còn ${hours}h ${String(minutes).padStart(2, "0")}m`;
+}
+
+function formatScheduledFor(iso: string): string {
+  return new Date(iso).toLocaleString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function LetterCardClient({ letter, viewerRole }: LetterCardClientProps) {
@@ -41,23 +52,36 @@ export function LetterCardClient({ letter, viewerRole }: LetterCardClientProps) 
   }, [open]);
 
   const expiresMs = new Date(letter.expiresAt).getTime();
+  const startsMs = new Date(letter.startsAt).getTime();
   const remainingMs = expiresMs - now;
   if (remainingMs <= 0) return null;
 
+  const isScheduled = startsMs > now;
+  // Princess never reaches this branch (RLS hides scheduled rows). Defensive only.
+  if (isScheduled && viewerRole === "PRINCESS") return null;
+
   const remainingLabel = formatRemaining(remainingMs);
+  const scheduledLabel = formatScheduledFor(letter.startsAt);
   const preview =
     letter.title?.trim() ||
     letter.body.replace(/\s+/g, " ").slice(0, 96).trim() + (letter.body.length > 96 ? "…" : "");
 
-  const headline =
-    viewerRole === "PRINCESS" ? "Một lá thư từ chàng" : "Lá thư em đã gửi cho nàng";
+  const headline = isScheduled
+    ? "Lá thư đã lên lịch"
+    : viewerRole === "PRINCESS"
+      ? "Một lá thư từ chàng"
+      : "Lá thư em đã gửi cho nàng";
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group relative w-full overflow-hidden rounded-[var(--radius-soft)] border border-gold/40 bg-gradient-to-br from-accent-soft/60 via-gold/15 to-mint-soft/60 px-5 py-5 text-left shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring/60 sm:px-6"
+        className={`group relative w-full overflow-hidden rounded-[var(--radius-soft)] px-5 py-5 text-left shadow-sm transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring/60 sm:px-6 ${
+          isScheduled
+            ? "border border-dashed border-gold/60 bg-gradient-to-br from-surface-soft/80 via-gold/10 to-surface-soft/60 opacity-95"
+            : "border border-gold/40 bg-gradient-to-br from-accent-soft/60 via-gold/15 to-mint-soft/60"
+        }`}
       >
         <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gold/15 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-8 -left-4 h-24 w-24 rounded-full bg-accent-soft/40 blur-2xl" />
@@ -70,12 +94,12 @@ export function LetterCardClient({ letter, viewerRole }: LetterCardClientProps) 
               {headline}
             </span>
             <span className="truncate text-base font-semibold text-foreground">{preview}</span>
-            <span className="mt-1 inline-flex items-center gap-2 text-[11px] text-muted">
+            <span className="mt-1 inline-flex flex-wrap items-center gap-2 text-[11px] text-muted">
               <span className="inline-flex items-center gap-1 rounded-full bg-surface/80 px-2 py-0.5 font-mono tabular-nums">
-                ⏳ {remainingLabel}
+                {isScheduled ? `📅 Mở vào ${scheduledLabel}` : `⏳ ${remainingLabel}`}
               </span>
               <span className="text-accent transition group-hover:translate-x-0.5">
-                Nhấn để đọc →
+                {isScheduled ? "Xem trước →" : "Nhấn để đọc →"}
               </span>
             </span>
           </div>
@@ -101,7 +125,7 @@ export function LetterCardClient({ letter, viewerRole }: LetterCardClientProps) 
                 <h2 className="text-lg font-semibold text-foreground">{letter.title}</h2>
               )}
               <span className="font-mono text-[11px] tabular-nums text-muted">
-                ⏳ {remainingLabel}
+                {isScheduled ? `📅 Hiện vào ${scheduledLabel}` : `⏳ ${remainingLabel}`}
               </span>
             </div>
             <button

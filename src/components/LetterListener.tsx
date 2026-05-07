@@ -56,6 +56,8 @@ export function LetterListener() {
     };
 
     void (async () => {
+      // RLS already filters out scheduled-for-future rows for Princess, so the
+      // initial fetch only returns letters that are actually visible right now.
       const { data } = await supabase
         .from("letters")
         .select("created_at, title")
@@ -82,7 +84,11 @@ export function LetterListener() {
           const row = payload.new as {
             created_at?: string;
             title?: string | null;
+            starts_at?: string;
           } | null;
+          // Skip scheduled letters — Princess will see them at next refresh
+          // after their starts_at arrives.
+          if (row?.starts_at && new Date(row.starts_at).getTime() > Date.now()) return;
           rainHearts();
           showToast(row?.title ?? null);
           if (row?.created_at) markSeen(row.created_at);

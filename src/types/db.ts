@@ -81,6 +81,7 @@ export interface Database {
           from_user: string;
           title: string | null;
           body: string;
+          starts_at: string;
           expires_at: string;
           created_at: string;
         };
@@ -89,6 +90,7 @@ export interface Database {
           from_user: string;
           title?: string | null;
           body: string;
+          starts_at?: string;
           expires_at?: string;
           created_at?: string;
         };
@@ -97,6 +99,7 @@ export interface Database {
           from_user?: string;
           title?: string | null;
           body?: string;
+          starts_at?: string;
           expires_at?: string;
           created_at?: string;
         };

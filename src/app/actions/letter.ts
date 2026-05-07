@@ -7,6 +7,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MAX_BODY = 5000;
 const MAX_TITLE = 120;
+const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+const CLOCK_SKEW_MS = 60 * 1000;
 
 export type LetterResult = { ok: true } | { ok: false; message: string };
 
@@ -21,11 +23,16 @@ const letterInput = z.object({
     .trim()
     .min(1, "Viết gì đó cho nàng đi 💌")
     .max(MAX_BODY, `Thư tối đa ${MAX_BODY} ký tự.`),
+  startsAt: z
+    .string()
+    .datetime({ message: "Ngày giờ không hợp lệ." })
+    .optional(),
 });
 
 export async function sendLetter(input: {
   title?: string;
   body: string;
+  startsAt?: string;
 }): Promise<LetterResult> {
   const viewer = await getViewer();
   if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
@@ -41,6 +48,20 @@ export async function sendLetter(input: {
     };
   }
 
+  let startsAtIso: string | undefined;
+  let expiresAtIso: string | undefined;
+  if (parsed.data.startsAt) {
+    const startsMs = new Date(parsed.data.startsAt).getTime();
+    if (Number.isNaN(startsMs)) {
+      return { ok: false, message: "Ngày giờ không hợp lệ." };
+    }
+    if (startsMs < Date.now() - CLOCK_SKEW_MS) {
+      return { ok: false, message: "Không thể đặt thư cho thời điểm đã qua." };
+    }
+    startsAtIso = new Date(startsMs).toISOString();
+    expiresAtIso = new Date(startsMs + TWENTY_FOUR_HOURS_MS).toISOString();
+  }
+
   const supabase = await createSupabaseServerClient();
 
   // Replace any previous letter from this Knight (active or not — keep table tidy).
@@ -50,6 +71,7 @@ export async function sendLetter(input: {
     from_user: viewer.userId,
     title: parsed.data.title || null,
     body: parsed.data.body,
+    ...(startsAtIso ? { starts_at: startsAtIso, expires_at: expiresAtIso } : {}),
   });
   if (error) return { ok: false, message: error.message };
 

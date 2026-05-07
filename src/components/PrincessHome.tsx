@@ -70,6 +70,7 @@ export function PrincessHome({
               id: activeLetter.id,
               title: activeLetter.title,
               body: activeLetter.body,
+              startsAt: activeLetter.startsAt,
               expiresAt: activeLetter.expiresAt,
             }}
             viewerRole="PRINCESS"

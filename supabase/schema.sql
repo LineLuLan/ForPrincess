@@ -206,8 +206,9 @@ end$$;
 
 -- letters ------------------------------------------------
 -- Long-form letter Knight sends to Princess (e.g. birthday card).
--- Active for 24h via expires_at; older rows are filtered out by RLS so
--- they vanish from the UI without needing a cron cleanup.
+-- Visible from `starts_at` (default now) until `expires_at`. Knight can
+-- schedule a letter to wake up on a future date (birthday-eve gift) by
+-- setting starts_at; expires_at is then computed as starts_at + 24h.
 -- Only one active letter at a time: sendLetter hard-deletes Knight's
 -- previous row before inserting the new one.
 create table if not exists letters (
@@ -219,7 +220,12 @@ create table if not exists letters (
   created_at  timestamptz not null default now()
 );
 
+-- Idempotent: schedule support added in May 2026.
+alter table letters
+  add column if not exists starts_at timestamptz not null default now();
+
 create index if not exists idx_letters_active on letters(expires_at desc);
+create index if not exists idx_letters_visible on letters(starts_at, expires_at);
 
 alter table letters enable row level security;
 
@@ -230,13 +236,20 @@ create policy "knight_inserts_letters" on letters
     and from_user = auth.uid()
   );
 
--- Both roles see only non-expired letters.
+-- Recipient-side: only see letters that have started AND not yet expired.
 drop policy if exists "letters_authed_select_active" on letters;
 create policy "letters_authed_select_active" on letters
   for select using (
     auth.uid() is not null
+    and starts_at <= now()
     and expires_at > now()
   );
+
+-- Sender-side: Knight always sees his own letters (even scheduled-for-future
+-- or already-expired) so he can preview/cancel/replace.
+drop policy if exists "knight_sees_own_letters" on letters;
+create policy "knight_sees_own_letters" on letters
+  for select using (from_user = auth.uid());
 
 -- Knight can delete his own letter (used by sendLetter to replace previous,
 -- and by manual cancel before expiry).

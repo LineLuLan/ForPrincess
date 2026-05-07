@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Loader2, Mail, Send, Trash2, X } from "lucide-react";
+import { CalendarClock, Loader2, Mail, Send, Trash2, X } from "lucide-react";
 import { cancelLetter, sendLetter } from "@/app/actions/letter";
 
 const MAX_BODY = 5000;
@@ -11,13 +11,22 @@ type LetterComposerButtonProps = {
   hasActiveLetter: boolean;
 };
 
+// Browser local time formatted as YYYY-MM-DDTHH:mm for the datetime-local input.
+function nowAsLocalInput(): string {
+  const d = new Date();
+  const off = d.getTimezoneOffset() * 60_000;
+  return new Date(d.getTime() - off).toISOString().slice(0, 16);
+}
+
 export function LetterComposerButton({ hasActiveLetter }: LetterComposerButtonProps) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [startsAtLocal, setStartsAtLocal] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const minLocal = nowAsLocalInput();
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -34,14 +43,28 @@ export function LetterComposerButton({ hasActiveLetter }: LetterComposerButtonPr
 
   const handleSend = () => {
     setError(null);
+    let startsAtIso: string | undefined;
+    if (startsAtLocal) {
+      const ms = new Date(startsAtLocal).getTime();
+      if (Number.isNaN(ms)) {
+        setError("Ngày giờ không hợp lệ.");
+        return;
+      }
+      startsAtIso = new Date(ms).toISOString();
+    }
     startTransition(async () => {
-      const r = await sendLetter({ title: title.trim() || undefined, body });
+      const r = await sendLetter({
+        title: title.trim() || undefined,
+        body,
+        startsAt: startsAtIso,
+      });
       if (!r.ok) {
         setError(r.message);
         return;
       }
       setTitle("");
       setBody("");
+      setStartsAtLocal("");
       setOpen(false);
     });
   };
@@ -98,7 +121,7 @@ export function LetterComposerButton({ hasActiveLetter }: LetterComposerButtonPr
           </div>
 
           <p className="text-xs text-muted">
-            Thư hiển thị 24h kể từ khi gửi rồi tự ẩn. Tối đa {MAX_BODY.toLocaleString("vi-VN")} ký tự.
+            Thư hiển thị 24h kể từ lúc mở rồi tự ẩn. Có thể đặt lịch để thư ngủ chờ tới ngày em chọn. Tối đa {MAX_BODY.toLocaleString("vi-VN")} ký tự.
           </p>
 
           {hasActiveLetter && (
@@ -131,6 +154,22 @@ export function LetterComposerButton({ hasActiveLetter }: LetterComposerButtonPr
             {titleTooLong && (
               <span className="text-xs text-accent">Tiêu đề tối đa {MAX_TITLE} ký tự.</span>
             )}
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
+              <CalendarClock className="h-3.5 w-3.5" /> Hiện thư từ (tùy chọn)
+            </span>
+            <input
+              type="datetime-local"
+              value={startsAtLocal}
+              min={minLocal}
+              onChange={(e) => setStartsAtLocal(e.target.value)}
+              className="block w-full rounded-2xl border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-ring/40"
+            />
+            <span className="text-[11px] text-muted">
+              Để trống = hiện ngay. Đặt giờ = thư ngủ chờ tới đúng phút đó (vẫn 24h kể từ lúc mở).
+            </span>
           </label>
 
           <label className="flex flex-1 flex-col gap-1.5">

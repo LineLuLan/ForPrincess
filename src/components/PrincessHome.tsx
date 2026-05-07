@@ -4,8 +4,10 @@ import { CalendarCountdown } from "@/components/CalendarCountdown";
 import { DailyLoveNote } from "@/components/DailyLoveNote";
 import { EmptyState } from "@/components/EmptyState";
 import { FloatingHearts } from "@/components/FloatingHearts";
+import { LetterCardClient } from "@/components/LetterCardClient";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
 import type { SpecialDate } from "@/lib/countdown";
+import type { ActiveLetter } from "@/lib/letter";
 import { type WishItem } from "@/types/wish";
 
 type PrincessHomeProps = {
@@ -13,6 +15,7 @@ type PrincessHomeProps = {
   specialDates: SpecialDate[];
   loveNotes: string[];
   viewerId: string | null;
+  activeLetter: ActiveLetter | null;
 };
 
 export function PrincessHome({
@@ -20,6 +23,7 @@ export function PrincessHome({
   specialDates,
   loveNotes,
   viewerId,
+  activeLetter,
 }: PrincessHomeProps) {
   return (
     <WishListProvider initialItems={items}>
@@ -56,6 +60,18 @@ export function PrincessHome({
             <CalendarCountdown dates={specialDates} />
           </div>
         </header>
+
+        {activeLetter && (
+          <LetterCardClient
+            letter={{
+              id: activeLetter.id,
+              title: activeLetter.title,
+              body: activeLetter.body,
+              expiresAt: activeLetter.expiresAt,
+            }}
+            viewerRole="PRINCESS"
+          />
+        )}
 
         <DailyLoveNote customNotes={loveNotes} />
 

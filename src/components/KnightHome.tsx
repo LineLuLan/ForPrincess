@@ -4,10 +4,13 @@ import { Countdown } from "@/components/Countdown";
 import { EmptyState } from "@/components/EmptyState";
 import { HeartRainButton } from "@/components/HeartRainButton";
 import { KpiBar } from "@/components/KpiBar";
+import { LetterCardClient } from "@/components/LetterCardClient";
+import { LetterComposerButton } from "@/components/LetterComposerButton";
 import { LoveNotesDialog } from "@/components/LoveNotesDialog";
 import { SpecialDatesDialog } from "@/components/SpecialDatesDialog";
 import { WishGrid, WishListProvider } from "@/components/WishGrid";
 import type { SpecialDate } from "@/lib/countdown";
+import type { ActiveLetter } from "@/lib/letter";
 import { type WishItem } from "@/types/wish";
 
 type KnightHomeProps = {
@@ -16,6 +19,7 @@ type KnightHomeProps = {
   loveNotes: string[];
   viewerId: string | null;
   pingCooldownMs: number;
+  activeLetter: ActiveLetter | null;
 };
 
 export function KnightHome({
@@ -24,6 +28,7 @@ export function KnightHome({
   loveNotes,
   viewerId,
   pingCooldownMs,
+  activeLetter,
 }: KnightHomeProps) {
   return (
     <WishListProvider initialItems={items}>
@@ -47,6 +52,7 @@ export function KnightHome({
               <Countdown dates={specialDates} tone="knight" />
               <SpecialDatesDialog initial={specialDates} />
               <LoveNotesDialog initial={loveNotes} />
+              <LetterComposerButton hasActiveLetter={activeLetter !== null} />
             </div>
             <div className="font-mono text-[11px] text-muted tabular-nums">
               last sync · {new Date().toLocaleTimeString("vi-VN")}
@@ -55,6 +61,18 @@ export function KnightHome({
         </header>
 
         <KpiBar items={items} />
+
+        {activeLetter && (
+          <LetterCardClient
+            letter={{
+              id: activeLetter.id,
+              title: activeLetter.title,
+              body: activeLetter.body,
+              expiresAt: activeLetter.expiresAt,
+            }}
+            viewerRole="KNIGHT"
+          />
+        )}
 
         <AddWishConnected />
 

@@ -203,6 +203,65 @@ begin
   end if;
 end$$;
 
+-- letters ------------------------------------------------
+-- Long-form letter Knight sends to Princess (e.g. birthday card).
+-- Active for 24h via expires_at; older rows are filtered out by RLS so
+-- they vanish from the UI without needing a cron cleanup.
+-- Only one active letter at a time: sendLetter hard-deletes Knight's
+-- previous row before inserting the new one.
+create table if not exists letters (
+  id          uuid primary key default gen_random_uuid(),
+  from_user   uuid not null references profiles(id) on delete cascade,
+  title       text,
+  body        text not null check (char_length(body) between 1 and 5000),
+  expires_at  timestamptz not null default (now() + interval '24 hours'),
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists idx_letters_active on letters(expires_at desc);
+
+alter table letters enable row level security;
+
+drop policy if exists "knight_inserts_letters" on letters;
+create policy "knight_inserts_letters" on letters
+  for insert with check (
+    (select role from profiles where id = auth.uid()) = 'KNIGHT'
+    and from_user = auth.uid()
+  );
+
+-- Both roles see only non-expired letters.
+drop policy if exists "letters_authed_select_active" on letters;
+create policy "letters_authed_select_active" on letters
+  for select using (
+    auth.uid() is not null
+    and expires_at > now()
+  );
+
+-- Knight can delete his own letter (used by sendLetter to replace previous,
+-- and by manual cancel before expiry).
+drop policy if exists "knight_deletes_own_letters" on letters;
+create policy "knight_deletes_own_letters" on letters
+  for delete using (
+    (select role from profiles where id = auth.uid()) = 'KNIGHT'
+    and from_user = auth.uid()
+  );
+
+-- Realtime publication for INSERT events (Princess listens for new letters).
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    if not exists (
+      select 1
+      from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'letters'
+    ) then
+      execute 'alter publication supabase_realtime add table letters';
+    end if;
+  end if;
+end$$;
+
 -- Storage policies — wish-images bucket -----------------
 -- "Public bucket" only makes objects publicly READable via the CDN URL;
 -- INSERT/UPDATE/DELETE on storage.objects still need explicit policies.

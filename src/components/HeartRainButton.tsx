@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Heart, Loader2, Send, X } from "lucide-react";
 import { sendHeartPing } from "@/app/actions/ping";
+import { PING_ICONS, PING_ICON_KEYS, type PingIcon } from "@/lib/ping-icons";
 import type { UserRole } from "@/types/wish";
 
 type HeartRainButtonProps = {
@@ -40,6 +41,7 @@ export function HeartRainButton({ initialCooldownMs, role }: HeartRainButtonProp
   const [now, setNow] = useState<number>(() => Date.now());
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState<PingIcon>("heart");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const composerRef = useRef<HTMLDivElement | null>(null);
@@ -68,7 +70,7 @@ export function HeartRainButton({ initialCooldownMs, role }: HeartRainButtonProp
     if (onCooldown || pending) return;
     setError(null);
     startTransition(async () => {
-      const r = await sendHeartPing(message.trim() || undefined);
+      const r = await sendHeartPing(message.trim() || undefined, selectedIcon);
       if (!r.ok) {
         setError(r.message);
         if (r.retryInSeconds) {
@@ -78,6 +80,7 @@ export function HeartRainButton({ initialCooldownMs, role }: HeartRainButtonProp
       }
       setReadyAt(Date.now() + 15 * 60 * 1000);
       setMessage("");
+      setSelectedIcon("heart");
       setOpen(false);
     });
   };
@@ -98,6 +101,27 @@ export function HeartRainButton({ initialCooldownMs, role }: HeartRainButtonProp
             >
               <X className="h-3.5 w-3.5" />
             </button>
+          </div>
+          <div className="mb-2 flex flex-wrap gap-1">
+            {PING_ICON_KEYS.map((key) => {
+              const active = selectedIcon === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelectedIcon(key)}
+                  aria-label={key}
+                  aria-pressed={active}
+                  className={`grid h-8 w-8 place-items-center rounded-full text-base leading-none transition ${
+                    active
+                      ? "scale-110 bg-accent ring-2 ring-accent/40"
+                      : "bg-surface-soft hover:bg-accent-soft"
+                  }`}
+                >
+                  <span aria-hidden>{PING_ICONS[key].emoji}</span>
+                </button>
+              );
+            })}
           </div>
           <textarea
             autoFocus

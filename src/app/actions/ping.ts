@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { getViewer } from "@/lib/auth";
+import { PING_ICON_KEYS } from "@/lib/ping-icons";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const COOLDOWN_MS = 15 * 60 * 1000;
@@ -13,20 +14,28 @@ export type PingResult =
 
 const pingInput = z.object({
   message: z.string().trim().max(MAX_MESSAGE).optional(),
+  iconType: z.enum(PING_ICON_KEYS).default("heart"),
 });
 
-export async function sendHeartPing(rawMessage?: string): Promise<PingResult> {
+export async function sendHeartPing(
+  rawMessage?: string,
+  rawIconType?: string,
+): Promise<PingResult> {
   const viewer = await getViewer();
   if (!viewer) return { ok: false, message: "Hãy đăng nhập đã nhé." };
 
-  const parsed = pingInput.safeParse({ message: rawMessage });
+  const parsed = pingInput.safeParse({
+    message: rawMessage,
+    iconType: rawIconType,
+  });
   if (!parsed.success) {
     return {
       ok: false,
-      message: parsed.error.issues[0]?.message ?? "Lời nhắn quá dài.",
+      message: parsed.error.issues[0]?.message ?? "Lời nhắn không hợp lệ.",
     };
   }
   const message = parsed.data.message?.trim() || null;
+  const iconType = parsed.data.iconType;
 
   const supabase = await createSupabaseServerClient();
 
@@ -51,7 +60,7 @@ export async function sendHeartPing(rawMessage?: string): Promise<PingResult> {
 
   const { error } = await supabase
     .from("pings")
-    .insert({ from_user: viewer.userId, type: "heart", message });
+    .insert({ from_user: viewer.userId, type: iconType, message });
 
   if (error) return { ok: false, message: error.message };
   return { ok: true };
